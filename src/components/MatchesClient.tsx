@@ -17,6 +17,28 @@ const STAGES: ("Alle" | Stage)[] = [
   "Finale",
 ];
 
+const BIG_TEAMS = new Set([
+  "Norge", "Brasil", "Argentina", "England", "Frankrike",
+  "Spania", "Tyskland", "Nederland", "Portugal", "Italia",
+  "Belgia", "Kroatia", "Uruguay",
+]);
+
+const HIGH_DEMAND_STAGES = new Set<Stage>([
+  "Kvartfinale", "Semifinale", "Bronsefinale", "Finale",
+]);
+
+function isHighDemand(m: Match): boolean {
+  if (m.norwayMatch) return true;
+  if (HIGH_DEMAND_STAGES.has(m.stage)) return true;
+  if (m.isOpener) return true;
+  const hasBigTeam = BIG_TEAMS.has(m.home) || BIG_TEAMS.has(m.away);
+  const bothBig = BIG_TEAMS.has(m.home) && BIG_TEAMS.has(m.away);
+  if (bothBig) return true;
+  // Big team in knockout = high demand
+  if (hasBigTeam && m.stage !== "Gruppespill") return true;
+  return false;
+}
+
 function groupBy<T, K extends string | number>(arr: T[], fn: (x: T) => K): Map<K, T[]> {
   const m = new Map<K, T[]>();
   for (const x of arr) {
@@ -118,8 +140,9 @@ export default function MatchesClient({ matches }: { matches: Match[] }) {
                         <span className="text-sm font-medium text-slate-400">
                           {formatKickoff(m.date, m.kickoff)}
                         </span>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 flex-wrap">
                           {m.norwayMatch && <Badge tone="red">🇳🇴 Norge</Badge>}
+                          {isHighDemand(m) && <Badge tone="yellow">🔥 Høy etterspørsel</Badge>}
                           <Badge tone="zinc">{m.stage}</Badge>
                         </div>
                       </div>
