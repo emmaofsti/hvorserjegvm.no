@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
@@ -10,6 +10,14 @@ const SITE_URL = "https://hvorserjegvm.no";
 const TITLE = "hvorserjegvm.no — Hvor kan du se Fotball-VM 2026 i Oslo?";
 const DESCRIPTION =
   "Komplett oversikt over fan zones, sportsbarer og puber i Oslo som viser Fotball-VM 2026. Filtrer på gratis, alkohol, familievennlig, uteservering og avstand fra deg.";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: "#0a1730",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -33,6 +41,11 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
   alternates: { canonical: SITE_URL },
   robots: { index: true, follow: true },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "hvorserjegvm.no",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -41,8 +54,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="flex min-h-full flex-col">
         <Header />
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-[var(--border)] py-6 text-center text-xs text-[var(--text-muted)]">
-          <div className="mx-auto max-w-7xl px-4 space-y-1">
+        <footer className="border-t border-[var(--border)] py-4 sm:py-6 text-center text-xs text-[var(--text-muted)] bottom-safe">
+          <div className="mx-auto max-w-7xl px-3 sm:px-4 space-y-1">
             <p>
               hvorserjegvm.no — uavhengig guide til VM 2026 i Oslo. Data hentet fra venuers nettsider og
               offentlige kilder per juni 2026.

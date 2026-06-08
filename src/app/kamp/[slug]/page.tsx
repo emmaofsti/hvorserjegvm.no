@@ -36,15 +36,19 @@ export default async function Page({ params }: PageProps) {
   const isKnockout = match.stage !== "Gruppespill";
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6">
-      <nav className="mb-4 text-sm">
-        <Link href="/kamper" className="text-slate-400 hover:text-slate-200">
+    <div className="mx-auto max-w-7xl px-3 py-4 sm:px-4 sm:py-6">
+      <nav className="mb-3 sm:mb-4 text-sm">
+        <Link
+          href="/kamper"
+          className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 -ml-2 text-slate-400 transition-colors hover:text-slate-200 active:bg-[var(--bg-surface)]"
+        >
           ← Alle kamper
         </Link>
       </nav>
 
-      <header className="mb-6 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-6">
-        <div className="mb-2 flex flex-wrap items-center gap-2 text-xs uppercase tracking-wider text-slate-400">
+      {/* Match header */}
+      <header className="mb-5 sm:mb-6 rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-4 sm:p-6">
+        <div className="mb-2 flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs uppercase tracking-wider text-slate-400">
           <span className="rounded-full bg-[var(--bg-subtle)] px-2 py-0.5">{match.stage}</span>
           {match.group && <span>Gruppe {match.group}</span>}
           {match.norwayMatch && (
@@ -58,35 +62,36 @@ export default async function Page({ params }: PageProps) {
             </span>
           )}
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-100 sm:text-5xl">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-100 sm:text-5xl">
           {match.home} <span className="text-slate-500">vs</span> {match.away}
         </h1>
-        <div className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-3">
+        {/* Match details — 2 col on mobile, 3 col on desktop */}
+        <div className="mt-3 sm:mt-4 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3 sm:gap-3">
           <div>
-            <div className="text-slate-500">Dato</div>
+            <div className="text-slate-500 text-xs sm:text-sm">Dato</div>
             <div className="font-medium text-slate-200">{formatDate(match.date)}</div>
           </div>
           <div>
-            <div className="text-slate-500">Avspark (norsk tid)</div>
+            <div className="text-slate-500 text-xs sm:text-sm">Avspark</div>
             <div className="font-medium text-slate-200">kl. {match.kickoff}</div>
           </div>
           <div>
-            <div className="text-slate-500">Stadion</div>
-            <div className="font-medium text-slate-200">
+            <div className="text-slate-500 text-xs sm:text-sm">Stadion</div>
+            <div className="font-medium text-slate-200 truncate">
               {match.stadium ? `${match.stadium}, ${match.city}` : "TBD"}
             </div>
           </div>
           {match.tvNorway && (
             <div>
-              <div className="text-slate-500">TV-sending</div>
+              <div className="text-slate-500 text-xs sm:text-sm">TV</div>
               <div className="font-medium text-slate-200">{match.tvNorway}</div>
             </div>
           )}
         </div>
       </header>
 
-      <section className="mb-3 flex items-baseline justify-between">
-        <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">Her kan du se kampen i Oslo</h2>
+      <section className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+        <h2 className="text-lg font-semibold text-slate-100 sm:text-2xl">Her kan du se kampen i Oslo</h2>
         {isKnockout && (
           <span className="text-xs text-slate-500">
             Lag bekreftes etter gruppespillet

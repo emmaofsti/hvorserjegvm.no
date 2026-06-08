@@ -33,19 +33,19 @@ export default function VenueCard({ venue, userLocation, cheapestBeer, onHover, 
   }
 
   return (
-    <Link href={`/sted/${venue.id}`} className="block">
+    <Link href={`/sted/${venue.id}`} className="block group">
     <Card
-      className="cursor-pointer transition hover:border-[var(--border-strong)] hover:shadow-md"
+      className="cursor-pointer transition-all duration-150 hover:border-[var(--border-strong)] hover:shadow-lg group-active:scale-[0.98]"
       onMouseEnter={() => onHover?.(venue.id)}
       onMouseLeave={() => onHover?.(null)}
     >
-      <CardBody className="space-y-3">
+      <CardBody className="space-y-2.5">
         {/* Header: navn + score */}
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className={`inline-block h-2 w-2 shrink-0 rounded-full ${dotColor[color]}`} aria-hidden />
-              <h3 className="truncate text-base font-semibold text-slate-100">{venue.name}</h3>
+              <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${dotColor[color]}`} aria-hidden />
+              <h3 className="truncate text-[15px] font-semibold text-slate-100 sm:text-base">{venue.name}</h3>
             </div>
             <p className="mt-0.5 truncate text-sm text-slate-400">
               {venue.neighborhood ?? venue.address ?? "—"}
@@ -53,7 +53,7 @@ export default function VenueCard({ venue, userLocation, cheapestBeer, onHover, 
             </p>
           </div>
           <span
-            className="shrink-0 rounded-md border border-[var(--border)] bg-[var(--bg-subtle)] px-2 py-0.5 text-[11px] font-bold tracking-tight text-slate-200"
+            className="shrink-0 rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] px-2 py-0.5 text-[11px] font-bold tracking-tight text-slate-200"
             title="VM-score basert på størrelse, kampdekning, sentralitet, stemning og kapasitet"
           >
             {score}
@@ -95,15 +95,16 @@ export default function VenueCard({ venue, userLocation, cheapestBeer, onHover, 
           <p className="text-xs text-slate-400">{venue.ticketPrice}</p>
         )}
 
-        <div className="flex flex-wrap gap-2 pt-1">
+        {/* Action buttons — full width on mobile for easy tapping */}
+        <div className="flex gap-2 pt-1">
           <a
             href={venue.website}
             target="_blank"
             rel="noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex"
+            className="inline-flex flex-1 sm:flex-none"
           >
-            <Button size="sm" variant="outline">
+            <Button size="sm" variant="outline" className="w-full sm:w-auto">
               Nettside
             </Button>
           </a>
@@ -113,9 +114,9 @@ export default function VenueCard({ venue, userLocation, cheapestBeer, onHover, 
               target="_blank"
               rel="noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="inline-flex"
+              className="inline-flex flex-1 sm:flex-none"
             >
-              <Button size="sm" variant="outline">
+              <Button size="sm" variant="outline" className="w-full sm:w-auto">
                 Veibeskrivelse
               </Button>
             </a>
@@ -126,9 +127,9 @@ export default function VenueCard({ venue, userLocation, cheapestBeer, onHover, 
               target="_blank"
               rel="noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="inline-flex"
+              className="inline-flex flex-1 sm:flex-none"
             >
-              <Button size="sm" variant="outline">
+              <Button size="sm" variant="outline" className="w-full sm:w-auto">
                 Maps
               </Button>
             </a>

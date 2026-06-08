@@ -5,7 +5,7 @@ import type { Venue, Match } from "@/lib/types";
 import VenueCard from "./VenueCard";
 import { vmScore } from "@/lib/score";
 import { haversineKm, walkingMinutes } from "@/lib/utils";
-import { Toggle } from "./ui";
+import { Toggle, Select } from "./ui";
 
 type Sort = "near" | "free" | "atmosphere" | "family" | "beer";
 
@@ -67,47 +67,38 @@ export default function MatchVenuesClient({ match, venues }: Props) {
   }, [eligible, freeOnly, familyOnly, sort, userLocation]);
 
   return (
-    <div className="space-y-4">
-      <section className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-3">
-        <div className="flex flex-wrap gap-2">
+    <div className="space-y-3 sm:space-y-4">
+      {/* Filters — stacked on mobile */}
+      <section className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-3">
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2.5 sm:mb-0">
           <Toggle label="Gratis" checked={freeOnly} onChange={setFreeOnly} />
           <Toggle label="Familievennlig" checked={familyOnly} onChange={setFamilyOnly} />
           {!userLocation && (
             <button
               onClick={requestLocation}
-              className="rounded-full border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-1.5 text-sm text-slate-200 hover:bg-[var(--border)]"
+              className="rounded-full border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-sm text-slate-200 hover:bg-[var(--border)] active:scale-95 transition-all"
             >
-              Sorter etter avstand
+              📍 Min posisjon
             </button>
           )}
         </div>
         <div className="flex items-center gap-2 text-sm">
-          <span className="text-slate-400">Sortér:</span>
-          <select
+          <span className="shrink-0 text-slate-400">Sortér:</span>
+          <Select
             value={sort}
             onChange={(e) => setSort(e.target.value as Sort)}
-            className="h-8 rounded-md border border-[var(--border-strong)] bg-[var(--bg-subtle)] px-2 text-sm text-slate-100"
+            className="!min-h-[38px] sm:!min-h-[44px]"
           >
             <option value="near">Nærmest meg</option>
             <option value="atmosphere">Best stemning</option>
             <option value="free">Gratis først</option>
             <option value="family">Familievennlig først</option>
             <option value="beer">🍺 Billigst øl først</option>
-          </select>
+          </Select>
         </div>
       </section>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((v) => (
-          <VenueCard key={v.id} venue={v} userLocation={userLocation} />
-        ))}
-      </div>
-      {filtered.length === 0 && (
-        <div className="rounded-xl border border-dashed border-[var(--border)] p-8 text-center text-slate-400">
-          Ingen steder matcher. Prøv å fjerne filter.
-        </div>
-      )}
-
+      {/* Nearest venue highlight */}
       {userLocation && filtered[0] && (
         <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-3 text-sm text-green-200">
           <strong>Nærmest deg:</strong> {filtered[0].name}
@@ -123,6 +114,18 @@ export default function MatchVenuesClient({ match, venues }: Props) {
               ({walkingMinutes(haversineKm({ lat: filtered[0].lat!, lng: filtered[0].lng! }, userLocation))} min å gå)
             </span>
           )}
+        </div>
+      )}
+
+      {/* Venue grid */}
+      <div className="grid grid-cols-1 gap-2.5 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {filtered.map((v) => (
+          <VenueCard key={v.id} venue={v} userLocation={userLocation} />
+        ))}
+      </div>
+      {filtered.length === 0 && (
+        <div className="rounded-xl border border-dashed border-[var(--border)] p-8 text-center text-slate-400">
+          Ingen steder matcher. Prøv å fjerne filter.
         </div>
       )}
     </div>

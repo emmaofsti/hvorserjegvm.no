@@ -37,22 +37,22 @@ export default function VenueDetailClient({ venue }: { venue: Venue }) {
   }, []);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <div className="mx-auto max-w-3xl px-3 py-5 sm:px-4 sm:py-8">
       {/* Tilbake-lenke */}
       <Link
         href="/"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-slate-400 transition-colors hover:text-slate-200"
+        className="mb-5 sm:mb-6 inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 -ml-2 text-sm text-slate-400 transition-colors hover:text-slate-200 active:bg-[var(--bg-surface)]"
       >
         ← Tilbake til alle steder
       </Link>
 
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-5 sm:mb-6">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <span className={`inline-block h-3 w-3 shrink-0 rounded-full ${dotColor[color]}`} aria-hidden />
-              <h1 className="text-2xl font-bold tracking-tight text-slate-100 sm:text-3xl">{venue.name}</h1>
+              <h1 className="text-xl font-bold tracking-tight text-slate-100 sm:text-3xl">{venue.name}</h1>
             </div>
             <p className="mt-2 text-sm text-slate-400">
               {venue.neighborhood && <span>{venue.neighborhood}</span>}
@@ -73,20 +73,20 @@ export default function VenueDetailClient({ venue }: { venue: Venue }) {
       </div>
 
       {/* Beskrivelse */}
-      <Card className="mb-5">
+      <Card className="mb-4 sm:mb-5">
         <CardBody>
           <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">Om stedet</h2>
-          <p className="text-base leading-relaxed text-slate-200">{venue.description}</p>
+          <p className="text-[15px] leading-relaxed text-slate-200 sm:text-base">{venue.description}</p>
         </CardBody>
       </Card>
 
-      {/* Detaljer-grid */}
-      <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {/* Detaljer-grid — 2 cols on mobile too for compact info */}
+      <div className="mb-4 sm:mb-5 grid grid-cols-2 gap-2.5 sm:gap-4">
         {/* Kapasitet */}
         <Card>
           <CardBody>
-            <h2 className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Kapasitet</h2>
-            <p className="text-lg font-semibold text-slate-100">
+            <h2 className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 sm:text-xs">Kapasitet</h2>
+            <p className="text-base font-semibold text-slate-100 sm:text-lg">
               {venue.capacity ?? "Ikke oppgitt"}
             </p>
           </CardBody>
@@ -95,9 +95,9 @@ export default function VenueDetailClient({ venue }: { venue: Venue }) {
         {/* Pris */}
         <Card>
           <CardBody>
-            <h2 className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Inngang</h2>
-            <p className="text-lg font-semibold text-slate-100">
-              {!venue.ticketRequired ? "Gratis" : "Billett kreves"}
+            <h2 className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 sm:text-xs">Inngang</h2>
+            <p className="text-base font-semibold text-slate-100 sm:text-lg">
+              {!venue.ticketRequired ? "Gratis" : "Billett"}
             </p>
             {venue.ticketPrice && (
               <p className="mt-1 text-xs text-slate-400">{venue.ticketPrice}</p>
@@ -109,9 +109,9 @@ export default function VenueDetailClient({ venue }: { venue: Venue }) {
         {venue.beerPrice !== null && (
           <Card>
             <CardBody>
-              <h2 className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Ølpris (0,5 L)</h2>
-              <p className="text-lg font-semibold text-slate-100">{venue.beerPrice} kr</p>
-              <p className="mt-1 text-xs text-slate-500">Kilde: pilsguiden.no</p>
+              <h2 className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 sm:text-xs">Ølpris (0,5 L)</h2>
+              <p className="text-base font-semibold text-slate-100 sm:text-lg">{venue.beerPrice} kr</p>
+              <p className="mt-1 text-[10px] text-slate-500 sm:text-xs">Kilde: pilsguiden.no</p>
             </CardBody>
           </Card>
         )}
@@ -119,16 +119,16 @@ export default function VenueDetailClient({ venue }: { venue: Venue }) {
         {/* Aldersgrense */}
         <Card>
           <CardBody>
-            <h2 className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">Aldersgrense</h2>
-            <p className="text-lg font-semibold text-slate-100">
-              {venue.ageLimit !== null ? `${venue.ageLimit}+` : "Ingen oppgitt"}
+            <h2 className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400 sm:text-xs">Aldersgrense</h2>
+            <p className="text-base font-semibold text-slate-100 sm:text-lg">
+              {venue.ageLimit !== null ? `${venue.ageLimit}+` : "Ingen"}
             </p>
           </CardBody>
         </Card>
       </div>
 
       {/* Badges */}
-      <Card className="mb-5">
+      <Card className="mb-4 sm:mb-5">
         <CardBody className="space-y-3">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Egenskaper</h2>
           <div className="flex flex-wrap gap-1.5">
@@ -150,10 +150,10 @@ export default function VenueDetailClient({ venue }: { venue: Venue }) {
         </CardBody>
       </Card>
 
-      {/* Handlinger */}
-      <div className="flex flex-wrap gap-3">
+      {/* Handlinger — stacked on mobile for big tap targets */}
+      <div className="flex flex-col gap-2.5 sm:flex-row sm:gap-3">
         <a href={venue.website} target="_blank" rel="noreferrer" className="inline-flex">
-          <Button>Besøk nettside →</Button>
+          <Button className="w-full sm:w-auto">Besøk nettside →</Button>
         </a>
         {venue.lat && venue.lng && (
           <a
@@ -162,7 +162,7 @@ export default function VenueDetailClient({ venue }: { venue: Venue }) {
             rel="noreferrer"
             className="inline-flex"
           >
-            <Button variant="outline">Veibeskrivelse</Button>
+            <Button variant="outline" className="w-full sm:w-auto">Veibeskrivelse</Button>
           </a>
         )}
         {(!venue.lat || !venue.lng) && (
@@ -172,14 +172,14 @@ export default function VenueDetailClient({ venue }: { venue: Venue }) {
             rel="noreferrer"
             className="inline-flex"
           >
-            <Button variant="outline">Vis på Maps</Button>
+            <Button variant="outline" className="w-full sm:w-auto">Vis på Maps</Button>
           </a>
         )}
       </div>
 
       {/* Kilder */}
       {venue.sources.length > 0 && (
-        <div className="mt-8 border-t border-[var(--border)] pt-4">
+        <div className="mt-6 sm:mt-8 border-t border-[var(--border)] pt-4">
           <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Kilder</h2>
           <ul className="space-y-1">
             {venue.sources.map((s, i) => (
@@ -188,7 +188,7 @@ export default function VenueDetailClient({ venue }: { venue: Venue }) {
                   href={s}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-xs text-slate-500 underline transition-colors hover:text-slate-300"
+                  className="text-xs text-slate-500 underline transition-colors hover:text-slate-300 break-all"
                 >
                   {s}
                 </a>
