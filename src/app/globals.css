@@ -411,12 +411,6 @@ button, a, [role="button"], input, select, label {
   height: calc(100vh - 52px);
   overflow: hidden;
 }
-@media (max-width: 1023px) {
-  /* Subtract bottom-nav height so map doesn't get clipped behind it */
-  .home-layout {
-    height: calc(100dvh - 52px - 60px - env(safe-area-inset-bottom));
-  }
-}
 @media (min-width: 1024px) {
   .home-layout { flex-direction: row; }
 }
@@ -457,37 +451,36 @@ button, a, [role="button"], input, select, label {
   .home-list-panel--hidden-mobile { display: block; }
 }
 
-/* ── Mobile: list panel ALWAYS shown above map (with controls) ── */
+/* ── Mobile: map sticks to top, controls + cards scroll naturally below ── */
 @media (max-width: 1023px) {
-  .home-layout { flex-direction: column; }
-  /* List panel comes first visually so controls sit above the map */
-  .home-list-panel {
-    order: 1;
-    flex: 0 0 auto;
-    overflow-y: visible;
-    padding-bottom: 4px;
-  }
-  /* Cards hidden by default (in map mode); shown when list mode is active */
-  .home-card-list {
-    display: none;
-  }
-  .home-list-panel--list-mode-mobile {
-    flex: 1 1 auto;
-    overflow-y: auto;
-    padding-bottom: 80px;
-  }
-  .home-list-panel--list-mode-mobile .home-card-list {
-    display: grid;
-  }
-  /* Map second, fills remaining */
-  .home-map-panel {
-    order: 2;
-    flex: 1 1 auto;
+  /* Layout becomes a normal scrolling page on mobile */
+  .home-layout {
+    flex-direction: column;
     height: auto;
-    min-height: 50vh;
+    overflow: visible;
   }
-  /* Hide chrome that doesn't make sense in map-mode on mobile */
-  .home-list-panel:not(.home-list-panel--list-mode-mobile) .home-results-bar { display: none; }
+  /* Map at top — always visible */
+  .home-map-panel {
+    height: 42vh;
+    min-height: 260px;
+    max-height: 480px;
+    flex-shrink: 0;
+  }
+  .home-map-panel--hidden-mobile {
+    /* Never hide the map on mobile — it's the killer feature */
+    display: block;
+  }
+  /* List panel: just flows naturally */
+  .home-list-panel {
+    flex: 0 0 auto;
+    overflow: visible;
+    padding-bottom: 100px;
+  }
+  .home-list-panel--hidden-mobile { display: block; }
+  /* Cards always shown on mobile */
+  .home-card-list { display: grid; }
+  /* Kart/Liste-toggle gives no value when both are always visible — hide it */
+  .home-view-toggle { display: none; }
 }
 
 .home-list-header { padding: 16px 16px 8px; }
