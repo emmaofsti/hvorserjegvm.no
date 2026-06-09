@@ -64,7 +64,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="flex min-h-full flex-col">
         <Header />
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-white/[0.06] py-6 sm:py-8 text-[12px] text-[var(--text-muted)] bottom-safe hidden sm:block">
+        <footer className="border-t border-white/[0.06] py-6 lg:py-8 text-[12px] text-[var(--text-muted)] bottom-safe hidden lg:block">
           <div className="mx-auto max-w-7xl px-4 space-y-2">
             <p className="leading-relaxed">
               hvorserjegvm.no — uavhengig guide til VM 2026 i Oslo. Data hentet fra venuers nettsider og
