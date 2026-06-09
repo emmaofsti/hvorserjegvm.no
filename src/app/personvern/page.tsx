@@ -286,10 +286,10 @@ export default function PersonvernPage() {
         <p className="text-[15px] text-slate-200 leading-relaxed">
           Spørsmål om personvern eller datakvalitet? Send en e-post til{" "}
           <a
-            href="mailto:hei@hvorserjegvm.no"
+            href="mailto:ewoldofsti@gmail.com"
             className="font-semibold underline"
           >
-            hei@hvorserjegvm.no
+            ewoldofsti@gmail.com
           </a>{" "}
           så svarer vi så snart vi kan.
         </p>
