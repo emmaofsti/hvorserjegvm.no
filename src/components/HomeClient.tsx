@@ -319,29 +319,9 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
           </div>
         )}
 
-        {/* View toggle + sort + count */}
+        {/* Sort + count + favoritter — toggle Kart/Liste er fjernet */}
         <div className="home-toolbar">
-          <div className="flex items-center gap-1">
-            {/* Map/List toggle */}
-            <div className="home-view-toggle">
-              <button
-                type="button"
-                onClick={() => setViewMode("map")}
-                className={`home-view-btn ${viewMode === "map" ? "home-view-btn--active" : ""}`}
-              >
-                Kart
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode("list")}
-                className={`home-view-btn ${viewMode === "list" ? "home-view-btn--active" : ""}`}
-              >
-                Liste
-              </button>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ml-auto">
             {/* Favorites toggle */}
             <button
               type="button"

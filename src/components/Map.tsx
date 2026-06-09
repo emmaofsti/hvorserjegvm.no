@@ -140,11 +140,6 @@ export default function VenuesMap({
                       <Icon.Free size={11} strokeWidth={2.2} /> Gratis
                     </span>
                   )}
-                  {v.ticketRequired && (
-                    <span className="lg-capsule inline-flex items-center gap-1 bg-amber-500/15 px-2 py-0.5 text-[11px] text-amber-200 ring-1 ring-inset ring-amber-400/30">
-                      <Icon.Ticket size={11} strokeWidth={2.2} /> Billett
-                    </span>
-                  )}
                   {v.beerPrice !== null && (
                     <span className="lg-capsule inline-flex items-center gap-1 bg-white/[0.06] px-2 py-0.5 text-[11px] text-slate-200 ring-1 ring-inset ring-white/[0.10]">
                       <Icon.Beer size={11} strokeWidth={2} /> <span className="tnum">{v.beerPrice}</span> kr
