@@ -399,3 +399,380 @@ button, a, [role="button"], input, select, label {
 
 /* The "tilbake" button + bg-white outline button in light mode */
 [data-theme="light"] .bg-white\/\[0\.04\].text-slate-100 { background-color: rgba(0, 0, 0, 0.040); color: #1c1917; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   REDESIGN — Split panel, venue cards, bottom nav
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Home Layout — split panel ───────────────────────────── */
+.home-layout {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 52px);
+  overflow: hidden;
+}
+@media (min-width: 1024px) {
+  .home-layout { flex-direction: row; }
+}
+
+.home-map-panel {
+  position: relative;
+  height: 45vh;
+  min-height: 260px;
+  flex-shrink: 0;
+}
+@media (min-width: 1024px) {
+  .home-map-panel {
+    width: 50%;
+    height: 100%;
+    position: sticky;
+    top: 52px;
+  }
+}
+.home-map-panel--hidden-mobile { display: none; }
+@media (min-width: 1024px) {
+  .home-map-panel--hidden-mobile { display: block; }
+}
+
+.home-list-panel {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: 80px;
+}
+@media (min-width: 1024px) {
+  .home-list-panel {
+    width: 50%;
+    padding-bottom: 24px;
+  }
+}
+.home-list-panel--hidden-mobile { display: none; }
+@media (min-width: 1024px) {
+  .home-list-panel--hidden-mobile { display: block; }
+}
+
+.home-list-header { padding: 16px 16px 8px; }
+.home-search { padding: 0 16px 10px; }
+.home-quick-filters { padding: 0 16px 8px; }
+.home-filters-expanded {
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--lg-edge-light);
+  border-bottom: 1px solid var(--lg-edge-light);
+  background: rgba(var(--lg-tint), 0.5);
+}
+.home-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  gap: 8px;
+}
+.home-results-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px 10px;
+}
+.home-card-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 0 16px;
+}
+@media (min-width: 640px) {
+  .home-card-list { grid-template-columns: 1fr 1fr; gap: 14px; }
+}
+
+/* ─── Map legend overlay ──────────────────────────────────── */
+.home-map-legend {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 1000;
+  pointer-events: auto;
+}
+.home-map-legend-inner {
+  background: rgba(var(--lg-tint), 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--lg-edge-light);
+  border-radius: var(--lg-r-l);
+  padding: 10px 14px;
+  box-shadow: var(--lg-shadow);
+}
+
+/* ─── Chips ───────────────────────────────────────────────── */
+.home-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text-secondary);
+  transition: all 180ms var(--lg-ease);
+  cursor: pointer;
+}
+.home-chip:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.14);
+}
+.home-chip--active {
+  background: rgba(220,38,38,0.14);
+  border-color: rgba(220,38,38,0.35);
+  color: #fecaca;
+}
+.home-chip-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9999px;
+  background: rgba(220,38,38,0.8);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── View toggle ─────────────────────────────────────────── */
+.home-view-toggle {
+  display: inline-flex;
+  border-radius: var(--lg-r-m);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+}
+.home-view-btn {
+  padding: 6px 16px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all 150ms;
+  cursor: pointer;
+}
+.home-view-btn--active {
+  background: rgba(255,255,255,0.10);
+  color: var(--text-primary);
+}
+
+/* ─── Venue Card ──────────────────────────────────────────── */
+.venue-card {
+  border-radius: var(--lg-r-xl);
+  overflow: hidden;
+  background: rgba(var(--lg-tint), 0.88);
+  border: 1px solid var(--lg-edge-light);
+  box-shadow: var(--lg-shadow);
+  transition: transform 220ms var(--lg-spring), box-shadow 220ms var(--lg-ease), border-color 200ms;
+}
+.venue-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+  box-shadow: var(--lg-shadow-floating);
+}
+.venue-card:active { transform: translateY(0); }
+
+.venue-card-image {
+  position: relative;
+  aspect-ratio: 16/10;
+  overflow: hidden;
+  background: var(--bg-subtle);
+}
+.venue-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 400ms var(--lg-ease);
+}
+.venue-card:hover .venue-card-img { transform: scale(1.05); }
+
+.venue-card-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.venue-card-score {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 2px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.venue-card-fav {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.8);
+  transition: all 200ms var(--lg-spring);
+  cursor: pointer;
+  border: none;
+}
+.venue-card-fav:hover { background: rgba(0,0,0,0.65); color: #fff; transform: scale(1.1); }
+.venue-card-fav--active { color: #ef4444; }
+.venue-card-fav--active:hover { color: #dc2626; }
+
+.venue-card-body { padding: 14px 14px 16px; }
+
+.venue-card-name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.venue-card-location {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.venue-card-distance { color: var(--text-muted); opacity: 0.7; }
+
+.venue-card-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.venue-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid var(--lg-edge-light);
+}
+.venue-card-beer {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.venue-card-beer--cheapest { color: #fbbf24; }
+.venue-card-beer-tag {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fbbf24;
+  background: rgba(251,191,36,0.15);
+  padding: 1px 6px;
+  border-radius: 9999px;
+}
+.venue-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: color 150ms;
+}
+.venue-card:hover .venue-card-cta { color: var(--text-primary); }
+
+/* ─── Bottom Nav ──────────────────────────────────────────── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  background: rgba(var(--lg-tint-deep), 0.88);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border-top: 1px solid var(--lg-edge-light);
+  padding-bottom: max(4px, env(safe-area-inset-bottom));
+}
+@media (min-width: 1024px) { .bottom-nav { display: none; } }
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 12px 4px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 150ms;
+  -webkit-tap-highlight-color: transparent;
+}
+.bottom-nav-item--active { color: #ef4444; }
+.bottom-nav-icon { position: relative; }
+.bottom-nav-badge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+}
+.bottom-nav-label { font-size: 10px; font-weight: 500; }
+
+/* ─── Scrollbar hide ──────────────────────────────────────── */
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* ─── Score marker z-index fix ────────────────────────────── */
+.vmoslo-score-marker { background: transparent !important; border: none !important; }
+
+/* ─── Light mode overrides for new components ─────────────── */
+[data-theme="light"] .venue-card { background: rgba(255,255,255,0.92); }
+[data-theme="light"] .venue-card-image-overlay { background: linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 50%); }
+[data-theme="light"] .home-chip { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08); color: var(--text-secondary); }
+[data-theme="light"] .home-chip:hover { background: rgba(0,0,0,0.06); }
+[data-theme="light"] .home-chip--active { background: rgba(220,38,38,0.08); border-color: rgba(220,38,38,0.25); color: #991b1b; }
+[data-theme="light"] .home-view-toggle { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08); }
+[data-theme="light"] .home-view-btn--active { background: rgba(0,0,0,0.08); }
+[data-theme="light"] .home-map-legend-inner { background: rgba(255,255,255,0.92); }
+[data-theme="light"] .bottom-nav { background: rgba(255,255,255,0.92); }
+[data-theme="light"] .home-filters-expanded { background: rgba(250,250,249,0.8); }

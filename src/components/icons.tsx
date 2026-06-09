@@ -34,6 +34,15 @@ import {
   Navigation,
   Compass,
   ArrowRight,
+  Heart,
+  ArrowUpDown,
+  Home,
+  Trophy,
+  Star,
+  Info,
+  Map,
+  List,
+  SlidersHorizontal,
 } from "lucide-react";
 
 export const Icon = {
@@ -65,6 +74,15 @@ export const Icon = {
   Navigation,
   Compass,
   ArrowRight,
+  Heart,
+  ArrowUpDown,
+  Home,
+  Trophy,
+  Star,
+  Info,
+  Map,
+  List,
+  SlidersHorizontal,
 };
 
 export type IconProps = React.SVGAttributes<SVGSVGElement> & { size?: number };

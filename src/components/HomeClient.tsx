@@ -8,8 +8,9 @@ import VenueDrawer from "./VenueDrawer";
 import Filters from "./Filters";
 import { haversineKm, walkingMinutes } from "@/lib/utils";
 import { vmScore } from "@/lib/score";
-import { Button, Input } from "./ui";
+import { Input, Select } from "./ui";
 import { Icon } from "./icons";
+import { useFavorites } from "@/lib/useFavorites";
 
 const VenuesMap = dynamic(() => import("./Map"), { ssr: false });
 
@@ -28,14 +29,20 @@ const DEFAULT_FILTERS: FilterState = {
   age: "all",
 };
 
+type SortOption = "score" | "distance" | "beer_price" | "name";
+
 export default function HomeClient({ venues }: { venues: Venue[] }) {
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [search, setSearch] = useState("");
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locError, setLocError] = useState<string | null>(null);
   const [highlightId, setHighlightId] = useState<string | null>(null);
-  const [showMap, setShowMap] = useState(true);
+  const [viewMode, setViewMode] = useState<"map" | "list">("map");
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
+  const [sortBy, setSortBy] = useState<SortOption>("score");
+  const [showFilters, setShowFilters] = useState(false);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const { favoriteIds } = useFavorites();
 
   const requestLocation = () => {
     if (!navigator.geolocation) {
@@ -63,6 +70,8 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
     const q = search.trim().toLowerCase();
     return venues
       .filter((v) => {
+        if (showFavoritesOnly && !favoriteIds.includes(v.id)) return false;
+
         if (q) {
           const hay = [v.name, v.neighborhood ?? "", v.address ?? "", v.description].join(" ").toLowerCase();
           if (!hay.includes(q)) return false;
@@ -96,98 +105,102 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
         }
         return true;
       })
-      .sort((a, b) => vmScore(b).total - vmScore(a).total);
-  }, [venues, filters, userLocation, search]);
+      .sort((a, b) => {
+        switch (sortBy) {
+          case "score":
+            return vmScore(b).total - vmScore(a).total;
+          case "distance":
+            if (!userLocation) return vmScore(b).total - vmScore(a).total;
+            const distA = a.lat && a.lng ? haversineKm({ lat: a.lat, lng: a.lng }, userLocation) : Infinity;
+            const distB = b.lat && b.lng ? haversineKm({ lat: b.lat, lng: b.lng }, userLocation) : Infinity;
+            return distA - distB;
+          case "beer_price":
+            const priceA = a.beerPrice ?? Infinity;
+            const priceB = b.beerPrice ?? Infinity;
+            return priceA - priceB;
+          case "name":
+            return a.name.localeCompare(b.name, "nb");
+          default:
+            return vmScore(b).total - vmScore(a).total;
+        }
+      });
+  }, [venues, filters, userLocation, search, sortBy, showFavoritesOnly, favoriteIds]);
+
+  const activeFilterCount = Object.entries(filters).filter(([k, v]) => {
+    if (k === "category") return v !== "all";
+    if (k === "age") return v !== "all";
+    if (k === "maxMinutesAway") return v !== null;
+    if (k === "maxBeerPrice") return v !== null;
+    return v === true;
+  }).length;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-5 sm:py-8">
-      {/* Hero */}
-      <section className="mb-6 sm:mb-8">
-        <p className="eyebrow mb-2">FIFA Fotball-VM 2026 · 11. juni – 19. juli</p>
-        <h1 className="display display-md sm:display-lg text-slate-50">
-          Hvor kan du se VM i Oslo?
-        </h1>
-        <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-slate-400">
-          <span className="tnum font-medium text-slate-200">{venues.length}</span> steder kartlagt — fra Fan Zones til
-          bydelspuber. Filtrer på pris, tak/vær, aldersgrense og avstand.
-        </p>
-      </section>
+    <div className="home-layout">
+      {/* ─── LEFT: Map panel (desktop) / Toggle view (mobile) ─── */}
+      <div className={`home-map-panel ${viewMode === "list" ? "home-map-panel--hidden-mobile" : ""}`}>
+        <VenuesMap venues={filtered} userLocation={userLocation} highlightId={highlightId} />
 
-      {/* Map */}
-      <section className="mb-5">
-        <button
-          type="button"
-          onClick={() => setShowMap((s) => !s)}
-          className="lg-capsule lg-energize mb-2 inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium text-slate-400 hover:text-slate-200 sm:hidden"
-        >
-          <Icon.ChevronDown
-            size={13}
-            strokeWidth={2.4}
-            className="transition-transform"
-            style={{ transform: showMap ? "rotate(0deg)" : "rotate(-90deg)" }}
-          />
-          {showMap ? "Skjul kart" : "Vis kart"}
-        </button>
-        <div
-          className={`overflow-hidden transition-all duration-300 ${
-            showMap ? "h-[40vh] sm:h-[58vh] min-h-[280px] sm:min-h-[440px]" : "h-0"
-          }`}
-          style={{ borderRadius: "var(--lg-r-xxl)" }}
-        >
-          <VenuesMap venues={filtered} userLocation={userLocation} highlightId={highlightId} />
+        {/* Legend overlay */}
+        <div className="home-map-legend">
+          <div className="home-map-legend-inner">
+            <span className="eyebrow !mb-0">VM-score</span>
+            <div className="flex items-center gap-3 mt-1.5">
+              <span className="flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.55)]" />
+                <span className="text-[11px] text-slate-300">Gratis</span>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.55)]" />
+                <span className="text-[11px] text-slate-300">Billett</span>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.55)]" />
+                <span className="text-[11px] text-slate-300">Familie</span>
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.65)]" />
+                <span className="text-[11px] text-slate-300">Fan Zone</span>
+              </span>
+            </div>
+          </div>
         </div>
-      </section>
+      </div>
 
-      {/* Legend + position — minimal strip, no chrome */}
-      <section className="mb-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px] text-slate-400">
-        <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.55)]" /> Gratis</span>
-        <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.55)]" /> Billett</span>
-        <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.55)]" /> Familievennlig</span>
-        <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.65)]" /> Storarrangement</span>
-        <div className="ml-auto flex items-center gap-2">
-          {!userLocation && (
-            <Button size="sm" variant="outline" onClick={requestLocation}>
-              <Icon.MapPin size={14} strokeWidth={2.2} /> Min posisjon
-            </Button>
-          )}
-          {userLocation && (
-            <span className="inline-flex items-center gap-1.5 text-emerald-300/90">
-              <Icon.MapPin size={13} strokeWidth={2.2} /> Posisjon delt
-            </span>
-          )}
-          {locError && (
-            <span className="inline-flex items-center gap-1.5 text-amber-300/90">
-              <Icon.Alert size={13} strokeWidth={2.2} /> {locError}
-            </span>
-          )}
+      {/* ─── RIGHT: List panel ─── */}
+      <div className={`home-list-panel ${viewMode === "map" ? "home-list-panel--hidden-mobile" : ""}`}>
+        {/* Header */}
+        <div className="home-list-header">
+          <div>
+            <h1 className="text-[22px] sm:text-[26px] font-bold tracking-tight text-slate-50 leading-tight">
+              Hvor ser jeg VM 2026?
+            </h1>
+            <p className="text-[13px] text-slate-400 mt-1">
+              Finn de beste stedene å se kampene i Oslo
+            </p>
+          </div>
         </div>
-      </section>
 
-      {/* Search + Filters — matte panel */}
-      <section
-        className="lg-surface mb-6 p-5 sm:p-6"
-        style={{ borderRadius: "var(--lg-r-xxl)" }}
-      >
-        <div className="mb-5">
+        {/* Search */}
+        <div className="home-search">
           <label className="relative block">
             <Icon.Search
               size={16}
               strokeWidth={2}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"
             />
             <Input
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={`Søk blant ${venues.length} steder…`}
-              className="pl-11 pr-11"
+              placeholder="Søk etter sted, område eller type..."
+              className="pl-10 pr-10 !min-h-[40px] !text-[13px]"
               aria-label="Søk i steder"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => setSearch("")}
-                className="lg-capsule lg-energize absolute right-2 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:bg-white/[0.10] hover:text-slate-100"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-100"
                 aria-label="Tøm søk"
               >
                 <Icon.X size={14} strokeWidth={2.4} />
@@ -195,51 +208,149 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
             )}
           </label>
         </div>
-        <Filters state={filters} onChange={setFilters} hasLocation={userLocation !== null} />
-      </section>
 
-      {/* Results header */}
-      <section className="mb-4 flex items-end justify-between gap-3">
-        <div>
-          <p className="eyebrow mb-0.5">Sortert etter VM-stemning</p>
-          <h2 className="text-[18px] font-semibold tracking-tight text-slate-100">
-            <span className="tnum">{filtered.length}</span> steder
-          </h2>
+        {/* Quick filters */}
+        <div className="home-quick-filters">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            <button
+              type="button"
+              onClick={() => setFilters((f) => ({ ...f, freeOnly: !f.freeOnly }))}
+              className={`home-chip ${filters.freeOnly ? "home-chip--active" : ""}`}
+            >
+              Gratis
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilters((f) => ({ ...f, alcohol: !f.alcohol }))}
+              className={`home-chip ${filters.alcohol ? "home-chip--active" : ""}`}
+            >
+              Alkohol
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilters((f) => ({ ...f, outdoor: !f.outdoor }))}
+              className={`home-chip ${filters.outdoor ? "home-chip--active" : ""}`}
+            >
+              Ute
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilters((f) => ({ ...f, familyFriendly: !f.familyFriendly }))}
+              className={`home-chip ${filters.familyFriendly ? "home-chip--active" : ""}`}
+            >
+              Familie
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowFilters((s) => !s)}
+              className={`home-chip home-chip--filter ${showFilters || activeFilterCount > 0 ? "home-chip--active" : ""}`}
+            >
+              <Icon.SlidersHorizontal size={13} strokeWidth={2} />
+              Flere filtre
+              {activeFilterCount > 0 && (
+                <span className="home-chip-count">{activeFilterCount}</span>
+              )}
+            </button>
+          </div>
         </div>
-        <button
-          onClick={() => {
-            setFilters(DEFAULT_FILTERS);
-            setSearch("");
-          }}
-          className="lg-capsule lg-energize px-3.5 py-2 text-[13px] font-medium text-slate-400 hover:bg-white/[0.06] hover:text-slate-100"
-        >
-          Nullstill
-        </button>
-      </section>
 
-      {/* Venue grid */}
-      <section className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((v) => (
-          <VenueCard
-            key={v.id}
-            venue={v}
-            userLocation={userLocation}
-            cheapestBeer={cheapestBeer}
-            onHover={setHighlightId}
-            onSelect={setSelectedVenue}
-          />
-        ))}
-        {filtered.length === 0 && (
-          <div
-            className="lg-surface col-span-full p-12 text-center"
-            style={{ borderRadius: "var(--lg-r-xxl)" }}
-          >
-            <Icon.Filter size={28} strokeWidth={1.5} className="mx-auto mb-3 text-slate-500" />
-            <p className="text-[15px] text-slate-300">Ingen steder matcher filtrene.</p>
-            <p className="mt-1 text-[13px] text-slate-500">Prøv å fjerne noen, eller trykk Nullstill.</p>
+        {/* Expandable full filters */}
+        {showFilters && (
+          <div className="home-filters-expanded">
+            <Filters state={filters} onChange={setFilters} hasLocation={userLocation !== null} />
           </div>
         )}
-      </section>
+
+        {/* View toggle + sort + count */}
+        <div className="home-toolbar">
+          <div className="flex items-center gap-1">
+            {/* Map/List toggle */}
+            <div className="home-view-toggle">
+              <button
+                type="button"
+                onClick={() => setViewMode("map")}
+                className={`home-view-btn ${viewMode === "map" ? "home-view-btn--active" : ""}`}
+              >
+                Kart
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("list")}
+                className={`home-view-btn ${viewMode === "list" ? "home-view-btn--active" : ""}`}
+              >
+                Liste
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Favorites toggle */}
+            <button
+              type="button"
+              onClick={() => setShowFavoritesOnly((s) => !s)}
+              className={`home-chip ${showFavoritesOnly ? "home-chip--active" : ""}`}
+              title="Vis kun favoritter"
+            >
+              <Icon.Heart size={13} strokeWidth={2} fill={showFavoritesOnly ? "currentColor" : "none"} />
+              <span className="hidden sm:inline">Favoritter</span>
+              {favoriteIds.length > 0 && (
+                <span className="home-chip-count">{favoriteIds.length}</span>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Results count + sort */}
+        <div className="home-results-bar">
+          <span className="text-[13px] text-slate-400">
+            <span className="tnum font-medium text-slate-200">{filtered.length}</span> steder funnet
+          </span>
+          <div className="flex items-center gap-1.5 text-[12px] text-slate-400">
+            <span>Sorter etter:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              className="bg-transparent text-slate-200 font-medium border-none outline-none cursor-pointer text-[12px] appearance-none pr-4 bg-[image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22><path fill=%22%2394a3b8%22 d=%22M5 6L0 0h10z%22/></svg>')] bg-no-repeat bg-[length:8px_5px] [background-position:right_0_center]"
+            >
+              <option value="score">VM-score</option>
+              <option value="distance">Avstand</option>
+              <option value="beer_price">Ølpris</option>
+              <option value="name">Navn</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Venue cards */}
+        <div className="home-card-list">
+          {filtered.map((v) => (
+            <VenueCard
+              key={v.id}
+              venue={v}
+              userLocation={userLocation}
+              cheapestBeer={cheapestBeer}
+              onHover={setHighlightId}
+              onSelect={setSelectedVenue}
+            />
+          ))}
+          {filtered.length === 0 && (
+            <div className="p-12 text-center lg-surface" style={{ borderRadius: "var(--lg-r-xl)" }}>
+              <Icon.Filter size={28} strokeWidth={1.5} className="mx-auto mb-3 text-slate-500" />
+              <p className="text-[15px] text-slate-300">Ingen steder matcher filtrene.</p>
+              <p className="mt-1 text-[13px] text-slate-500">Prøv å fjerne noen, eller trykk Nullstill.</p>
+              <button
+                onClick={() => {
+                  setFilters(DEFAULT_FILTERS);
+                  setSearch("");
+                  setShowFavoritesOnly(false);
+                }}
+                className="mt-4 text-[13px] font-medium text-red-400 hover:text-red-300"
+              >
+                Nullstill alle filtre
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Bottom-sheet drawer for venue details */}
       <VenueDrawer venue={selectedVenue} onClose={() => setSelectedVenue(null)} />

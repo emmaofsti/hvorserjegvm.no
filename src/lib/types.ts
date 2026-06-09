@@ -33,6 +33,7 @@ export interface Venue {
   sources: string[];
   verified: Verified;
   needsVerification?: string[];
+  imageUrl?: string;
 }
 
 export type Stage =

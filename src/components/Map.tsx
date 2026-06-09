@@ -1,11 +1,12 @@
 "use client";
 
-import { MapContainer, TileLayer, CircleMarker, Popup, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Popup, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useEffect, useRef } from "react";
 import type { Venue } from "@/lib/types";
 import { venueMarkerColor, directionsUrl, googleMapsUrl } from "@/lib/utils";
+import { vmScore } from "@/lib/score";
 import { Icon } from "./icons";
 
 const colorHex: Record<"green" | "yellow" | "blue" | "red", string> = {
@@ -14,6 +15,31 @@ const colorHex: Record<"green" | "yellow" | "blue" | "red", string> = {
   blue: "#2563eb",
   red: "#dc2626",
 };
+
+function createScoreIcon(score: number, color: string, highlighted: boolean): L.DivIcon {
+  const size = highlighted ? 42 : 34;
+  const fontSize = highlighted ? 14 : 12;
+  const shadow = highlighted ? "0 0 0 4px rgba(255,255,255,0.3)," : "";
+  return L.divIcon({
+    className: "vmoslo-score-marker",
+    html: `<div style="
+      width:${size}px;height:${size}px;
+      border-radius:50%;
+      background:${color};
+      border:2.5px solid #fff;
+      box-shadow:${shadow}0 2px 8px rgba(0,0,0,0.4);
+      display:flex;align-items:center;justify-content:center;
+      font-size:${fontSize}px;font-weight:700;color:#fff;
+      font-family:var(--font-geist-sans),system-ui,sans-serif;
+      font-variant-numeric:tabular-nums;
+      transition:transform 150ms ease, box-shadow 150ms ease;
+      ${highlighted ? "transform:scale(1.15);z-index:1000!important;" : ""}
+    ">${score}</div>`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+    popupAnchor: [0, -(size / 2 + 4)],
+  });
+}
 
 const userIcon = L.divIcon({
   className: "vmoslo-user-marker",
@@ -63,8 +89,8 @@ export default function VenuesMap({ venues, userLocation, highlightId, defaultCe
       style={{ height: "100%", width: "100%", borderRadius: "0.75rem" }}
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
       />
       {userLocation && (
         <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
@@ -73,16 +99,14 @@ export default function VenuesMap({ venues, userLocation, highlightId, defaultCe
       )}
       {venues.map((v) =>
         v.lat && v.lng ? (
-          <CircleMarker
+          <Marker
             key={v.id}
-            center={[v.lat, v.lng]}
-            radius={highlightId === v.id ? 14 : 10}
-            pathOptions={{
-              color: "#ffffff",
-              weight: 2,
-              fillColor: colorHex[venueMarkerColor(v)],
-              fillOpacity: 0.95,
-            }}
+            position={[v.lat, v.lng]}
+            icon={createScoreIcon(
+              vmScore(v).total,
+              colorHex[venueMarkerColor(v)],
+              highlightId === v.id,
+            )}
           >
             <Popup>
               <div className="space-y-2 text-[13px] text-slate-100">
@@ -147,7 +171,7 @@ export default function VenuesMap({ venues, userLocation, highlightId, defaultCe
                 </div>
               </div>
             </Popup>
-          </CircleMarker>
+          </Marker>
         ) : null,
       )}
     </MapContainer>
