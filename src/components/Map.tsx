@@ -36,14 +36,19 @@ export default function VenuesMap({ venues, userLocation, highlightId, defaultCe
     if (!highlightId || !mapRef.current) return;
     const v = venues.find((x) => x.id === highlightId);
     if (v && v.lat && v.lng) {
-      mapRef.current.flyTo([v.lat, v.lng], 16, { duration: 0.7 });
+      mapRef.current.flyTo([v.lat, v.lng], 15, { duration: 0.5 });
     }
   }, [highlightId, venues]);
 
-  const fallback = defaultCenter ?? { lat: 59.9139, lng: 10.7522 };
-  const center: [number, number] = userLocation
-    ? [userLocation.lat, userLocation.lng]
-    : [fallback.lat, fallback.lng];
+  const center: [number, number] = defaultCenter
+    ? [defaultCenter.lat, defaultCenter.lng]
+    : [59.9139, 10.7522]; // Oslo sentrum — alltid standard
+
+  // Begrens kartet til Oslo-området så det ikke kan hoppes til helt andre steder
+  const osloBounds: L.LatLngBoundsExpression = [
+    [59.82, 10.55], // sørvest
+    [60.01, 10.95], // nordøst
+  ];
 
   return (
     <MapContainer
@@ -51,6 +56,9 @@ export default function VenuesMap({ venues, userLocation, highlightId, defaultCe
       center={center}
       zoom={defaultZoom ?? 13}
       scrollWheelZoom
+      maxBounds={osloBounds}
+      maxBoundsViscosity={0.9}
+      minZoom={11}
       style={{ height: "100%", width: "100%", borderRadius: "0.75rem" }}
     >
       <TileLayer

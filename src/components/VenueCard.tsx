@@ -36,8 +36,12 @@ export default function VenueCard({ venue, userLocation, cheapestBeer, onHover, 
     <Link href={`/sted/${venue.id}`} className="block group">
     <Card
       className="cursor-pointer transition-all duration-150 hover:border-[var(--border-strong)] hover:shadow-lg group-active:scale-[0.98]"
-      onMouseEnter={() => onHover?.(venue.id)}
-      onMouseLeave={() => onHover?.(null)}
+      onMouseEnter={() => {
+        if (window.matchMedia("(hover: hover)").matches) onHover?.(venue.id);
+      }}
+      onMouseLeave={() => {
+        if (window.matchMedia("(hover: hover)").matches) onHover?.(null);
+      }}
     >
       <CardBody className="space-y-2.5">
         {/* Header: navn + score */}

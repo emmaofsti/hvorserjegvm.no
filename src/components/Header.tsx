@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 
 export default function Header() {
@@ -8,9 +9,14 @@ export default function Header() {
     <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg-page)]/85 backdrop-blur-lg">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:py-3">
         <Link href="/" className="flex items-center gap-2 active:opacity-80 transition-opacity">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 text-sm font-bold text-white shadow-sm shadow-red-900/40">
-            VM
-          </span>
+          <Image
+            src="/logo.jpg"
+            alt="hvorserjegvm.no logo"
+            width={36}
+            height={36}
+            className="rounded-lg shadow-sm"
+            priority
+          />
           <span className="text-base font-bold tracking-tight text-slate-100 sm:text-lg">
             hvorserjegvm.no
           </span>
