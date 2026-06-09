@@ -2,47 +2,109 @@
  * Venue image resolver.
  *
  * Priority chain:
- *   1. manualOverrides — curated photos found on venue's website (gallery pages)
- *   2. scrapedTyped    — og:image from venue's main page (autoscraped)
- *      → unless venue is in skipScrapedLogo (the scrape returned a logo/favicon)
- *   3. unsplash-by-category — multiple photos per category, picked deterministically
- *
- * Re-run scraper: node scripts/scrape-venue-images.mjs
+ *   1. manualOverrides     — curated images (real venue photos or carefully-
+ *                            chosen stock that matches venue character)
+ *   2. scrapedTyped        — og:image autoscraped from the venue's own page
+ *                            (unless in skipScrapedLogo — favicon/logo)
+ *   3. unsplashByCategory  — varied per-category fallback, picked
+ *                            deterministically by venue id so neighbors
+ *                            don't share the same photo
  */
 import scraped from "./venueImagesScraped.json";
 
 const scrapedTyped = scraped as Record<string, string>;
 
-/** Squarespace and many WP hosts serve over both http and https — force https. */
 function ensureHttps(url: string): string {
   if (url.startsWith("http://")) return "https://" + url.slice(7);
   return url;
 }
 
 /**
- * Curated photos found on each venue's own gallery/about page.
- * These beat anything else.
+ * Curated photo per venue.
+ * - Real venue photos (from their own gallery/about pages) are best.
+ * - Stock photos here are deliberately chosen to MATCH the venue's vibe
+ *   (Irish pub for Old Irish, outdoor crowd for Spikersuppa, etc.) and
+ *   are kept unique so they don't repeat with the category pool.
  */
 const manualOverrides: Record<string, string> = {
-  // Fan zones (the og:image scrape failed for these — their landing pages
-  // are JS-rendered or don't expose og:image)
+  // ── Fan zones — real hero photos from their own sites ──
   "fotball-i-parken":
     "https://cdn.prod.website-files.com/6909dfabc111725a3656f965/6914a6197ebd9dc1444e4b70_fotballiparken_02.avif",
   "fotball-pa-jordal":
     "https://www.fotballpajordal.no/media/hero-med-lys.png",
+  "lekter-n":
+    "https://vmlektern.lovable.app/assets/hero-lektern-B0krEp8T.jpg",
   "vippa":
     "https://cdn.prod.website-files.com/69a86ebfd9f90927de027b3d/69ba93eb3c55bbd26716b8db_NIC_8744.webp",
-  // Bars — better gallery photos than scraped logos
+
+  // ── Fan zones without scrapable photos — curated outdoor crowd stock ──
+  "fotball-i-sentrum-spikersuppa":
+    "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=900&h=560&fit=crop&q=80", // outdoor crowd celebration
+  "kongens-gate-fotballfesten":
+    "https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=900&h=560&fit=crop&q=80", // crowd watching screen
+  "ullevaal-stadion-fotballfesten":
+    "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=900&h=560&fit=crop&q=80", // stadium aerial
+
+  // ── Sports bars with real gallery photos ──
   "bernies":
     "https://bernies.no/wp-content/uploads/2021/08/bar.jpg",
   "pokalen-vulkan":
     "https://pokalenpub.no/wp-content/uploads/2022/10/P1944831-1-1024x768.jpg",
+
+  // ── Irish-style pubs — wooden warm interior stock ──
+  "old-irish-majorstuen":
+    "https://images.unsplash.com/photo-1517637382994-f02da38c6728?w=900&h=560&fit=crop&q=80",
+  "dubliner":
+    "https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=900&h=560&fit=crop&q=80",
+
+  // ── Other priority venues with curated stock per character ──
+  "store-sta":
+    "https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=900&h=560&fit=crop&q=80", // bar with darts
+  "magneten":
+    "https://images.unsplash.com/photo-1593069567131-53a0614dde1d?w=900&h=560&fit=crop&q=80", // man at bar
+  "proud-mary":
+    "https://images.unsplash.com/photo-1577471488278-16eec37ffcc2?w=900&h=560&fit=crop&q=80", // pub interior
+  "crafty-dog":
+    "https://images.unsplash.com/photo-1546195643-70f48f9c5b87?w=900&h=560&fit=crop&q=80", // craft beer
+
+  // ── Restaurants & event venues ──
+  "panda-restaurant":
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900&h=560&fit=crop&q=80",
+  "gronland-boulebar":
+    "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=900&h=560&fit=crop&q=80",
+  "ost-stadionpub":
+    "https://images.unsplash.com/photo-1471295253337-3ceaaedca402?w=900&h=560&fit=crop&q=80", // stadium crowd
+
+  // ── Logo-scrape blocklist replacements ──
+  "taket-steen-strom":
+    "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=900&h=560&fit=crop&q=80", // rooftop terrace
+  "beer-palace":
+    "https://images.unsplash.com/photo-1559526324-c1f275fbfa32?w=900&h=560&fit=crop&q=80", // beer bar
+  "hasle-linie-gastropub":
+    "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=900&h=560&fit=crop&q=80", // gastropub
+  "haandtryk":
+    "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=900&h=560&fit=crop&q=80", // sports bar
+  "lannisters":
+    "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?w=900&h=560&fit=crop&q=80", // cocktail bar
+  "o-reillys":
+    "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=900&h=560&fit=crop&q=80", // Irish pub
+  "bohemen":
+    "https://images.unsplash.com/photo-1592861956120-e524fc739696?w=900&h=560&fit=crop&q=80", // sports pub
+  "sentralpuben":
+    "https://images.unsplash.com/photo-1560840067-ddcaeb7831d2?w=900&h=560&fit=crop&q=80", // station pub
+  "vesper":
+    "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=900&h=560&fit=crop&q=80", // cocktails / bar
+  "lincoln-sportsbar":
+    "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=900&h=560&fit=crop&q=80", // sports bar
+  "tgi-fridays-city":
+    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=900&h=560&fit=crop&q=80", // American diner-style
+  "o-learys-vika":
+    "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=900&h=560&fit=crop&q=80", // sports bar
 };
 
 /**
- * Venues whose autoscraped og:image is actually a logo, favicon or PNG icon.
- * Forcing them to use the category Unsplash fallback gives a much better look
- * than a stretched 180×180 transparent PNG on a 16:10 card.
+ * Venues whose autoscraped og:image is just a logo/favicon.
+ * (Now mostly covered by manualOverrides — left in for safety.)
  */
 const skipScrapedLogo = new Set<string>([
   "taket-steen-strom",
@@ -61,44 +123,40 @@ const skipScrapedLogo = new Set<string>([
 ]);
 
 /**
- * Multiple Unsplash photos per category — picked deterministically by venue id
- * so each venue stays consistent across reloads, but neighbors don't repeat.
+ * Final fallback — varied per-category pools, picked deterministically by id.
  */
 const unsplashByCategory: Record<string, string[]> = {
   fan_zone: [
-    "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&h=500&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1471295253337-3ceaaedca402?w=900&h=560&fit=crop&q=80",
   ],
   sports_bar: [
-    "https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1575037614876-c38a4c44f5b8?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1546195643-70f48f9c5b87?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1530036846422-cea8c9a30fdb?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1593069567131-53a0614dde1d?w=800&h=500&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1546195643-70f48f9c5b87?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1593069567131-53a0614dde1d?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1452860606245-08befc0ff44b?w=900&h=560&fit=crop&q=80",
   ],
   pub: [
-    "https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1571024082860-52e0e41a3b24?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1583589811107-1b27e4c2e9e7?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1592861956120-e524fc739696?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1560840067-ddcaeb7831d2?w=800&h=500&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1592861956120-e524fc739696?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1560840067-ddcaeb7831d2?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1517637382994-f02da38c6728?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1577471488278-16eec37ffcc2?w=900&h=560&fit=crop&q=80",
   ],
   restaurant: [
-    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=500&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=900&h=560&fit=crop&q=80",
   ],
   street_food: [
-    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1542528180-1c2803fef89b?w=800&h=500&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1611605698335-8b1569810432?w=800&h=500&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=900&h=560&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1611605698335-8b1569810432?w=900&h=560&fit=crop&q=80",
   ],
 };
 
