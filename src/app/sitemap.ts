@@ -11,6 +11,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const root: MetadataRoute.Sitemap = [
     { url: BASE, lastModified: now, changeFrequency: "daily", priority: 1 },
     { url: `${BASE}/kamper`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
+    { url: `${BASE}/billigst-ol`, lastModified: now, changeFrequency: "weekly", priority: 0.85 },
+    { url: `${BASE}/favoritter`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${BASE}/personvern`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
   ];
 
   const venueUrls: MetadataRoute.Sitemap = venues.map((v) => ({
