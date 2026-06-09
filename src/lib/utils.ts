@@ -55,6 +55,19 @@ export function formatDate(date: string): string {
   });
 }
 
+/**
+ * Parse a free-form capacity string into a number.
+ * Examples: "~1000" → 1000, "1 500 fans" → 1500, "350+" → 350,
+ *           "ca 160 + 800 m²" → 160, "stor" → null.
+ */
+export function parseCapacity(raw: string | null): number | null {
+  if (!raw) return null;
+  const m = raw.replace(/\s+/g, "").match(/(\d+)/);
+  if (!m) return null;
+  const n = Number(m[1]);
+  return Number.isFinite(n) ? n : null;
+}
+
 export function venueMarkerColor(v: {
   ticketRequired: boolean;
   familyFriendly: boolean | null;

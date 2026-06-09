@@ -6,7 +6,6 @@ import L from "leaflet";
 import { useEffect, useRef } from "react";
 import type { Venue } from "@/lib/types";
 import { venueMarkerColor, directionsUrl, googleMapsUrl } from "@/lib/utils";
-import { vmScore } from "@/lib/score";
 import { Icon } from "./icons";
 
 const colorHex: Record<"green" | "yellow" | "blue" | "red", string> = {
@@ -16,10 +15,9 @@ const colorHex: Record<"green" | "yellow" | "blue" | "red", string> = {
   red: "#dc2626",
 };
 
-function createScoreIcon(score: number, color: string, highlighted: boolean): L.DivIcon {
-  const size = highlighted ? 42 : 34;
-  const fontSize = highlighted ? 14 : 12;
-  const shadow = highlighted ? "0 0 0 4px rgba(255,255,255,0.3)," : "";
+function createMarkerIcon(color: string, highlighted: boolean): L.DivIcon {
+  const size = highlighted ? 22 : 16;
+  const ring = highlighted ? "0 0 0 4px rgba(255,255,255,0.25)," : "";
   return L.divIcon({
     className: "vmoslo-score-marker",
     html: `<div style="
@@ -27,16 +25,12 @@ function createScoreIcon(score: number, color: string, highlighted: boolean): L.
       border-radius:50%;
       background:${color};
       border:2.5px solid #fff;
-      box-shadow:${shadow}0 2px 8px rgba(0,0,0,0.4);
-      display:flex;align-items:center;justify-content:center;
-      font-size:${fontSize}px;font-weight:700;color:#fff;
-      font-family:var(--font-geist-sans),system-ui,sans-serif;
-      font-variant-numeric:tabular-nums;
+      box-shadow:${ring}0 2px 8px rgba(0,0,0,0.45);
       transition:transform 150ms ease, box-shadow 150ms ease;
       ${highlighted ? "transform:scale(1.15);z-index:1000!important;" : ""}
-    ">${score}</div>`,
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
+    "></div>`,
+    iconSize: [size + 6, size + 6],
+    iconAnchor: [(size + 6) / 2, (size + 6) / 2],
     popupAnchor: [0, -(size / 2 + 4)],
   });
 }
@@ -102,8 +96,7 @@ export default function VenuesMap({ venues, userLocation, highlightId, defaultCe
           <Marker
             key={v.id}
             position={[v.lat, v.lng]}
-            icon={createScoreIcon(
-              vmScore(v).total,
+            icon={createMarkerIcon(
               colorHex[venueMarkerColor(v)],
               highlightId === v.id,
             )}

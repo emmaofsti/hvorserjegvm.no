@@ -106,6 +106,8 @@ export interface FilterState {
   ticketed: boolean;
   maxMinutesAway: number | null;
   maxBeerPrice: number | null;
+  /** Minimum venue capacity (parsed from string). null = no filter. */
+  minCapacity: number | null;
   category: Category | "all";
   age: AgeFilter;
 }

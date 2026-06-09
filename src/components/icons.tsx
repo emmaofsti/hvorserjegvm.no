@@ -43,6 +43,8 @@ import {
   Map,
   List,
   SlidersHorizontal,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 
 export const Icon = {
@@ -83,6 +85,8 @@ export const Icon = {
   Map,
   List,
   SlidersHorizontal,
+  Maximize2,
+  Minimize2,
 };
 
 export type IconProps = React.SVGAttributes<SVGSVGElement> & { size?: number };

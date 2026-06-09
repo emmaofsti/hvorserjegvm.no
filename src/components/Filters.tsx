@@ -118,7 +118,7 @@ export default function Filters({ state, onChange, hasLocation }: FiltersProps) 
         </button>
 
         {open && (
-          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <label className="eyebrow !mb-1 block">
               Kategori
               <Select
@@ -145,6 +145,20 @@ export default function Filters({ state, onChange, hasLocation }: FiltersProps) 
                 <option value="no_limit">Ingen aldersgrense / familievennlig</option>
                 <option value="max_18">Maks 18 år</option>
                 <option value="max_20">Maks 20 år</option>
+              </Select>
+            </label>
+            <label className="eyebrow !mb-1 block">
+              Min. kapasitet
+              <Select
+                value={state.minCapacity ?? ""}
+                onChange={(e) => set("minCapacity", e.target.value ? Number(e.target.value) : null)}
+                className="mt-1.5"
+              >
+                <option value="">Alle størrelser</option>
+                <option value="100">Minst 100 plasser</option>
+                <option value="300">Minst 300 plasser</option>
+                <option value="500">Minst 500 plasser</option>
+                <option value="1000">Minst 1000 plasser</option>
               </Select>
             </label>
             <label className="eyebrow !mb-1 block">

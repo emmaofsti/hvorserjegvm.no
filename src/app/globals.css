@@ -797,6 +797,51 @@ button, a, [role="button"], input, select, label {
 /* ─── Score marker z-index fix ────────────────────────────── */
 .vmoslo-score-marker { background: transparent !important; border: none !important; }
 
+/* ─── Fullscreen map (mobile) ───────────────────────────────
+   Stor skjerm: kartet dekker hele viewporten.
+   Knappen er øverst til høyre, klikkbar i begge modus. */
+.home-map-fullscreen-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1001;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 9999px;
+  background: rgba(var(--lg-tint-deep), 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--lg-edge-light);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  box-shadow: var(--lg-shadow);
+  transition: transform 180ms var(--lg-spring), background-color 150ms;
+  cursor: pointer;
+}
+.home-map-fullscreen-btn:active { transform: scale(0.95); }
+.home-map-fullscreen-btn:hover { background: rgba(var(--lg-tint-deep), 0.95); }
+
+@media (min-width: 1024px) {
+  /* Desktop har allerede stor delt-skjerm — knappen er ikke nødvendig */
+  .home-map-fullscreen-btn { display: none; }
+}
+
+/* Når kartet er i fullscreen — dekker hele viewporten */
+.home-map-panel--fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 100 !important;
+  height: 100dvh !important;
+  max-height: none !important;
+  min-height: 100dvh !important;
+}
+.home-map-panel--fullscreen .home-map-legend {
+  bottom: max(20px, env(safe-area-inset-bottom));
+}
+
 /* ─── Light mode overrides for new components ─────────────── */
 [data-theme="light"] .venue-card { background: rgba(255,255,255,0.92); }
 [data-theme="light"] .venue-card-image-overlay { background: linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 50%); }

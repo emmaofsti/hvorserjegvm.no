@@ -5,7 +5,6 @@ import type { Venue } from "@/lib/types";
 import { Badge } from "./ui";
 import { Icon } from "./icons";
 import { haversineKm, walkingMinutes } from "@/lib/utils";
-import { vmScore } from "@/lib/score";
 import { useFavorites } from "@/lib/useFavorites";
 import { getVenueImageUrl } from "@/lib/venueImages";
 
@@ -21,7 +20,6 @@ interface VenueCardProps {
 const IconSize = 12;
 
 export default function VenueCard({ venue, userLocation, cheapestBeer, onHover, onSelect }: VenueCardProps) {
-  const score = vmScore(venue).total;
   const isCheapest = cheapestBeer != null && venue.beerPrice === cheapestBeer;
   const { isFavorite, toggleFavorite } = useFavorites();
   const fav = isFavorite(venue.id);
@@ -64,11 +62,6 @@ export default function VenueCard({ venue, userLocation, cheapestBeer, onHover, 
           />
           {/* Gradient overlay */}
           <div className="venue-card-image-overlay" />
-
-          {/* VM-score badge - top left */}
-          <div className="venue-card-score" title="VM-score">
-            <span className="tnum">{score}</span>
-          </div>
 
           {/* Favorite heart - top right */}
           <button

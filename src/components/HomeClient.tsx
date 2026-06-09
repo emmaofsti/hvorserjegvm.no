@@ -7,7 +7,7 @@ import Link from "next/link";
 import VenueCard from "./VenueCard";
 import VenueDrawer from "./VenueDrawer";
 import Filters from "./Filters";
-import { haversineKm, walkingMinutes } from "@/lib/utils";
+import { haversineKm, parseCapacity, walkingMinutes } from "@/lib/utils";
 import { vmScore } from "@/lib/score";
 import { Input, Select } from "./ui";
 import { Icon } from "./icons";
@@ -26,11 +26,12 @@ const DEFAULT_FILTERS: FilterState = {
   ticketed: false,
   maxMinutesAway: null,
   maxBeerPrice: null,
+  minCapacity: null,
   category: "all",
   age: "all",
 };
 
-type SortOption = "score" | "distance" | "beer_price" | "name";
+type SortOption = "recommended" | "distance" | "beer_price" | "capacity" | "name";
 
 export default function HomeClient({ venues }: { venues: Venue[] }) {
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
@@ -40,7 +41,8 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
   const [highlightId, setHighlightId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
-  const [sortBy, setSortBy] = useState<SortOption>("score");
+  const [sortBy, setSortBy] = useState<SortOption>("recommended");
+  const [mapFullscreen, setMapFullscreen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const { favoriteIds } = useFavorites();
@@ -104,11 +106,15 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
         if (filters.maxBeerPrice !== null) {
           if (v.beerPrice === null || v.beerPrice > filters.maxBeerPrice) return false;
         }
+        if (filters.minCapacity !== null) {
+          const cap = parseCapacity(v.capacity);
+          if (cap === null || cap < filters.minCapacity) return false;
+        }
         return true;
       })
       .sort((a, b) => {
         switch (sortBy) {
-          case "score":
+          case "recommended":
             return vmScore(b).total - vmScore(a).total;
           case "distance":
             if (!userLocation) return vmScore(b).total - vmScore(a).total;
@@ -116,9 +122,10 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
             const distB = b.lat && b.lng ? haversineKm({ lat: b.lat, lng: b.lng }, userLocation) : Infinity;
             return distA - distB;
           case "beer_price":
-            const priceA = a.beerPrice ?? Infinity;
-            const priceB = b.beerPrice ?? Infinity;
-            return priceA - priceB;
+            return (a.beerPrice ?? Infinity) - (b.beerPrice ?? Infinity);
+          case "capacity":
+            // Descending — largest first; null capacity goes to end
+            return (parseCapacity(b.capacity) ?? -1) - (parseCapacity(a.capacity) ?? -1);
           case "name":
             return a.name.localeCompare(b.name, "nb");
           default:
@@ -132,19 +139,39 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
     if (k === "age") return v !== "all";
     if (k === "maxMinutesAway") return v !== null;
     if (k === "maxBeerPrice") return v !== null;
+    if (k === "minCapacity") return v !== null;
     return v === true;
   }).length;
 
   return (
     <div className="home-layout">
-      {/* ─── LEFT: Map panel (desktop) / Toggle view (mobile) ─── */}
-      <div className={`home-map-panel ${viewMode === "list" ? "home-map-panel--hidden-mobile" : ""}`}>
+      {/* ─── LEFT: Map panel ─── */}
+      <div
+        className={`home-map-panel ${viewMode === "list" ? "home-map-panel--hidden-mobile" : ""} ${
+          mapFullscreen ? "home-map-panel--fullscreen" : ""
+        }`}
+      >
         <VenuesMap venues={filtered} userLocation={userLocation} highlightId={highlightId} />
 
-        {/* Legend overlay */}
+        {/* Fullscreen toggle (mobile only) */}
+        <button
+          type="button"
+          onClick={() => setMapFullscreen((f) => !f)}
+          className="home-map-fullscreen-btn"
+          aria-label={mapFullscreen ? "Liten skjerm" : "Stor skjerm"}
+        >
+          {mapFullscreen ? (
+            <Icon.Minimize2 size={16} strokeWidth={2.4} />
+          ) : (
+            <Icon.Maximize2 size={16} strokeWidth={2.4} />
+          )}
+          <span className="ml-1.5 hidden xs:inline">{mapFullscreen ? "Liten" : "Stor"}</span>
+        </button>
+
+        {/* Legend overlay — kategori, ikke score */}
         <div className="home-map-legend">
           <div className="home-map-legend-inner">
-            <span className="eyebrow !mb-0">VM-score</span>
+            <span className="eyebrow !mb-0">Markører</span>
             <div className="flex items-center gap-3 mt-1.5">
               <span className="flex items-center gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.55)]" />
@@ -338,9 +365,10 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
               onChange={(e) => setSortBy(e.target.value as SortOption)}
               className="bg-transparent text-slate-200 font-medium border-none outline-none cursor-pointer text-[12px] appearance-none pr-4 bg-[image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22><path fill=%22%2394a3b8%22 d=%22M5 6L0 0h10z%22/></svg>')] bg-no-repeat bg-[length:8px_5px] [background-position:right_0_center]"
             >
-              <option value="score">VM-score</option>
+              <option value="recommended">Anbefalt</option>
               <option value="distance">Avstand</option>
               <option value="beer_price">Ølpris</option>
+              <option value="capacity">Størst først</option>
               <option value="name">Navn</option>
             </select>
           </div>

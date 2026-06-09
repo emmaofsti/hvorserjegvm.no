@@ -18,7 +18,6 @@ import {
   venueMarkerColor,
   walkingMinutes,
 } from "@/lib/utils";
-import { vmScore } from "@/lib/score";
 
 const VenuesMap = dynamic(() => import("./Map"), { ssr: false });
 
@@ -46,7 +45,6 @@ export default function VenueDetailBody({
   venue: Venue;
   context?: "page" | "drawer";
 }) {
-  const score = vmScore(venue).total;
   const color = venueMarkerColor(venue);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
@@ -76,12 +74,6 @@ export default function VenueDetailBody({
               {venue.address && <span>{venue.address}</span>}
             </p>
           </div>
-          <span
-            className="shrink-0 inline-flex items-center justify-center min-w-[48px] h-[48px] px-2 rounded-xl bg-white/[0.05] border border-white/[0.08] text-[18px] font-bold tracking-tight text-slate-100 num-display"
-            title="VM-score basert på størrelse, kampdekning, sentralitet, stemning og kapasitet"
-          >
-            {score}
-          </span>
         </div>
       </div>
 
