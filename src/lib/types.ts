@@ -55,6 +55,8 @@ export interface Match {
   group?: string;
   norwayMatch?: boolean;
   tvNorway?: string;
+  /** TV-kanal som sender kampen (NRK / TV 2 / NRK + TV 2). */
+  tvChannel?: string;
   stadium?: string;
   city?: string;
   isOpener?: boolean;

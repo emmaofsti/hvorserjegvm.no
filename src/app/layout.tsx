@@ -16,7 +16,10 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: "cover",
-  themeColor: "#0a1730",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fafaf9" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0c" },
+  ],
 };
 
 export const metadata: Metadata = {
@@ -48,28 +51,40 @@ export const metadata: Metadata = {
   },
 };
 
+const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark')}catch(e){document.documentElement.setAttribute('data-theme','dark')}})();`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="nb" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="nb" data-theme="dark" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <head>
+        {/* Pre-hydration theme setter — runs synchronously before paint */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="flex min-h-full flex-col">
         <Header />
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-[var(--border)] py-4 sm:py-6 text-center text-xs text-[var(--text-muted)] bottom-safe">
-          <div className="mx-auto max-w-7xl px-3 sm:px-4 space-y-1">
-            <p>
+        <footer className="border-t border-white/[0.06] py-6 sm:py-8 text-[12px] text-[var(--text-muted)] bottom-safe">
+          <div className="mx-auto max-w-7xl px-4 space-y-2">
+            <p className="leading-relaxed">
               hvorserjegvm.no — uavhengig guide til VM 2026 i Oslo. Data hentet fra venuers nettsider og
               offentlige kilder per juni 2026.
             </p>
-            <p>
+            <p className="leading-relaxed">
               Ølpriser via{" "}
-              <a className="underline hover:text-slate-200" href="https://www.pilsguiden.no/oslo" target="_blank" rel="noreferrer">
+              <a className="underline underline-offset-4 hover:text-slate-200" href="https://www.pilsguiden.no/oslo" target="_blank" rel="noreferrer">
                 pilsguiden.no
               </a>
               {" "}— 0,5 L pils, vanlig pris.
             </p>
-            <p className="mt-3 border-t border-[var(--border)] pt-3 text-[11px] text-slate-500">
-              ⚠️ Denne siden er laget med hjelp av AI. Feil eller endringer kan forekomme.
-              Er det noe kritisk — dobbeltsjekk selv.
+            <p className="mt-4 inline-flex items-start gap-1.5 border-t border-white/[0.06] pt-4 text-[11px] text-slate-500 leading-relaxed">
+              <span className="mt-0.5 shrink-0">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                  <path d="M12 9v4" />
+                  <path d="M12 17h.01" />
+                </svg>
+              </span>
+              Denne siden er laget med hjelp av AI. Feil eller endringer kan forekomme — er det noe kritisk, dobbeltsjekk selv.
             </p>
           </div>
         </footer>

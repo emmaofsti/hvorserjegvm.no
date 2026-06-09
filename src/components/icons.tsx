@@ -1,0 +1,70 @@
+/**
+ * Shared icon set — every emoji in the UI is replaced by a Lucide SVG.
+ * Keep the strokeWidth and size consistent for a unified feel.
+ *
+ * The only emoji we keep: country flags (🇳🇴, 🇫🇷 …). Flags are
+ * semantic, not decorative, and rendered identically across platforms.
+ */
+import {
+  Beer,
+  Umbrella,
+  Sun,
+  Moon,
+  CloudSun,
+  Ticket,
+  BadgeCheck,
+  Users,
+  Flame,
+  MapPin,
+  Search,
+  X,
+  ChevronRight,
+  ChevronDown,
+  AlertTriangle,
+  Sparkles,
+  TicketCheck,
+  Calendar,
+  Tv,
+  CalendarDays,
+  Filter,
+  Wine,
+  Baby,
+  Building,
+  ExternalLink,
+  Navigation,
+  Compass,
+  ArrowRight,
+} from "lucide-react";
+
+export const Icon = {
+  Beer,
+  Umbrella,
+  Sun,
+  Moon,
+  CloudSun,
+  Ticket,
+  Free: BadgeCheck,
+  Users,
+  Flame,
+  MapPin,
+  Search,
+  X,
+  ChevronRight,
+  ChevronDown,
+  Alert: AlertTriangle,
+  Sparkles,
+  TicketCheck,
+  Calendar,
+  CalendarDays,
+  Tv,
+  Filter,
+  Wine,
+  Baby,
+  Building,
+  ExternalLink,
+  Navigation,
+  Compass,
+  ArrowRight,
+};
+
+export type IconProps = React.SVGAttributes<SVGSVGElement> & { size?: number };

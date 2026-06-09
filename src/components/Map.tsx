@@ -6,6 +6,7 @@ import L from "leaflet";
 import { useEffect, useRef } from "react";
 import type { Venue } from "@/lib/types";
 import { venueMarkerColor, directionsUrl, googleMapsUrl } from "@/lib/utils";
+import { Icon } from "./icons";
 
 const colorHex: Record<"green" | "yellow" | "blue" | "red", string> = {
   green: "#16a34a",
@@ -84,35 +85,63 @@ export default function VenuesMap({ venues, userLocation, highlightId, defaultCe
             }}
           >
             <Popup>
-              <div className="space-y-1.5 text-sm text-slate-100">
-                <div className="text-base font-bold text-slate-100">{v.name}</div>
-                {v.address && <div className="text-slate-400">{v.address}</div>}
-                <div className="flex flex-wrap gap-1 pt-1">
-                  {!v.ticketRequired && <span className="rounded bg-green-500/15 px-1.5 py-0.5 text-xs text-green-300 ring-1 ring-inset ring-green-500/30">Gratis</span>}
-                  {v.ticketRequired && <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-xs text-amber-300 ring-1 ring-inset ring-amber-500/30">Billett</span>}
-                  {v.indoorViewing && v.outdoorViewing && <span className="rounded bg-sky-500/15 px-1.5 py-0.5 text-xs text-sky-300 ring-1 ring-inset ring-sky-500/30">Inne + ute</span>}
-                  {v.indoorViewing && !v.outdoorViewing && <span className="rounded bg-sky-500/15 px-1.5 py-0.5 text-xs text-sky-300 ring-1 ring-inset ring-sky-500/30">🌧️ Under tak</span>}
-                  {!v.indoorViewing && v.outdoorViewing && <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-xs text-amber-300 ring-1 ring-inset ring-amber-500/30">☀️ Kun ute</span>}
-                  {v.ageLimit !== null && <span className="rounded bg-[var(--bg-subtle)] px-1.5 py-0.5 text-xs text-slate-300 ring-1 ring-inset ring-[var(--border)]">{v.ageLimit}+ år</span>}
-                  {v.alcohol && <span className="rounded bg-[var(--bg-subtle)] px-1.5 py-0.5 text-xs text-slate-300 ring-1 ring-inset ring-[var(--border)]">Alkohol</span>}
-                  {v.showsAllMatches && <span className="rounded bg-[var(--bg-subtle)] px-1.5 py-0.5 text-xs text-slate-300 ring-1 ring-inset ring-[var(--border)]">Alle kamper</span>}
-                  {v.familyFriendly && <span className="rounded bg-sky-500/15 px-1.5 py-0.5 text-xs text-sky-300 ring-1 ring-inset ring-sky-500/30">Familievennlig</span>}
+              <div className="space-y-2 text-[13px] text-slate-100">
+                <div>
+                  <div className="text-[15px] font-bold tracking-tight text-slate-50">{v.name}</div>
+                  {v.address && <div className="mt-0.5 text-[12px] text-slate-400">{v.address}</div>}
                 </div>
-                <div className="flex gap-3 pt-2 text-xs">
-                  <a className="font-medium text-red-400 hover:text-red-300" href={v.website} target="_blank" rel="noreferrer">
-                    Nettside →
+                <div className="flex flex-wrap gap-1 pt-0.5">
+                  {!v.ticketRequired && (
+                    <span className="lg-capsule inline-flex items-center gap-1 bg-emerald-500/15 px-2 py-0.5 text-[11px] text-emerald-200 ring-1 ring-inset ring-emerald-400/25">
+                      <Icon.Free size={11} strokeWidth={2.2} /> Gratis
+                    </span>
+                  )}
+                  {v.ticketRequired && (
+                    <span className="lg-capsule inline-flex items-center gap-1 bg-amber-500/15 px-2 py-0.5 text-[11px] text-amber-200 ring-1 ring-inset ring-amber-400/30">
+                      <Icon.Ticket size={11} strokeWidth={2.2} /> Billett
+                    </span>
+                  )}
+                  {v.beerPrice !== null && (
+                    <span className="lg-capsule inline-flex items-center gap-1 bg-white/[0.06] px-2 py-0.5 text-[11px] text-slate-200 ring-1 ring-inset ring-white/[0.10]">
+                      <Icon.Beer size={11} strokeWidth={2} /> <span className="tnum">{v.beerPrice}</span> kr
+                    </span>
+                  )}
+                  {v.indoorViewing && v.outdoorViewing && (
+                    <span className="lg-capsule inline-flex items-center gap-1 bg-sky-500/15 px-2 py-0.5 text-[11px] text-sky-200 ring-1 ring-inset ring-sky-400/25">
+                      <Icon.CloudSun size={11} strokeWidth={2} /> Inne + ute
+                    </span>
+                  )}
+                  {v.indoorViewing && !v.outdoorViewing && (
+                    <span className="lg-capsule inline-flex items-center gap-1 bg-sky-500/15 px-2 py-0.5 text-[11px] text-sky-200 ring-1 ring-inset ring-sky-400/25">
+                      <Icon.Umbrella size={11} strokeWidth={2} /> Under tak
+                    </span>
+                  )}
+                  {!v.indoorViewing && v.outdoorViewing && (
+                    <span className="lg-capsule inline-flex items-center gap-1 bg-amber-500/15 px-2 py-0.5 text-[11px] text-amber-200 ring-1 ring-inset ring-amber-400/30">
+                      <Icon.Sun size={11} strokeWidth={2} /> Kun ute
+                    </span>
+                  )}
+                  {v.ageLimit !== null && (
+                    <span className="lg-capsule inline-flex items-center gap-1 bg-white/[0.06] px-2 py-0.5 text-[11px] text-slate-300 ring-1 ring-inset ring-white/[0.08]">
+                      <span className="tnum">{v.ageLimit}</span>+ år
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1.5 text-[12px]">
+                  <a className="inline-flex items-center gap-1 font-medium text-red-300 hover:text-red-200" href={v.website} target="_blank" rel="noreferrer">
+                    Nettside <Icon.ExternalLink size={11} strokeWidth={2.2} />
                   </a>
                   <a
-                    className="font-medium text-red-400 hover:text-red-300"
+                    className="inline-flex items-center gap-1 font-medium text-red-300 hover:text-red-200"
                     href={directionsUrl(userLocation, { lat: v.lat!, lng: v.lng! })}
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Veibeskrivelse →
+                    <Icon.Navigation size={11} strokeWidth={2.2} /> Veibeskrivelse
                   </a>
                   {!userLocation && (
-                    <a className="font-medium text-red-400 hover:text-red-300" href={googleMapsUrl(v.address, v.name)} target="_blank" rel="noreferrer">
-                      Maps →
+                    <a className="inline-flex items-center gap-1 font-medium text-red-300 hover:text-red-200" href={googleMapsUrl(v.address, v.name)} target="_blank" rel="noreferrer">
+                      <Icon.MapPin size={11} strokeWidth={2.2} /> Maps
                     </a>
                   )}
                 </div>
