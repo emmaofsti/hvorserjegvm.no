@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
 import type { Venue, FilterState } from "@/lib/types";
+import Link from "next/link";
 import VenueCard from "./VenueCard";
 import VenueDrawer from "./VenueDrawer";
 import Filters from "./Filters";
@@ -166,8 +167,8 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
         </div>
       </div>
 
-      {/* ─── RIGHT: List panel ─── */}
-      <div className={`home-list-panel ${viewMode === "map" ? "home-list-panel--hidden-mobile" : ""}`}>
+      {/* ─── RIGHT: List panel (also holds controls on mobile, sits above map) ─── */}
+      <div className={`home-list-panel ${viewMode === "list" ? "home-list-panel--list-mode-mobile" : ""}`}>
         {/* Header */}
         <div className="home-list-header">
           <div>
@@ -179,6 +180,31 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
             </p>
           </div>
         </div>
+
+        {/* Beer-price spotlight */}
+        {cheapestBeer !== null && (() => {
+          const winner = venues
+            .filter((v) => v.beerPrice === cheapestBeer)
+            .sort((a, b) => a.name.localeCompare(b.name))[0];
+          return winner ? (
+            <div className="px-4 pb-2">
+              <Link
+                href="/billigst-ol"
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-amber-400/[0.08] border border-amber-400/25 hover:bg-amber-400/[0.12] transition-colors"
+              >
+                <Icon.Beer size={18} strokeWidth={2} className="shrink-0 text-amber-300" />
+                <span className="min-w-0 flex-1 text-[13px]">
+                  <span className="font-semibold text-amber-100">Billigst pils nå:</span>{" "}
+                  <span className="text-slate-100 truncate">{winner.name}</span>{" "}
+                  <span className="num-display text-emerald-300">{winner.beerPrice} kr</span>
+                </span>
+                <span className="shrink-0 text-[12px] text-amber-200/80 inline-flex items-center gap-0.5">
+                  Se topp 10 <Icon.ArrowRight size={12} strokeWidth={2.4} />
+                </span>
+              </Link>
+            </div>
+          ) : null;
+        })()}
 
         {/* Search */}
         <div className="home-search">
