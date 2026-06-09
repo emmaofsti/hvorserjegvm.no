@@ -833,14 +833,28 @@ button, a, [role="button"], input, select, label {
 .home-map-panel--fullscreen {
   position: fixed !important;
   inset: 0 !important;
-  z-index: 100 !important;
+  z-index: 1000 !important;
   height: 100dvh !important;
+  width: 100vw !important;
   max-height: none !important;
   min-height: 100dvh !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+.home-map-panel--fullscreen .leaflet-container {
+  border-radius: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
 }
 .home-map-panel--fullscreen .home-map-legend {
   bottom: max(20px, env(safe-area-inset-bottom));
 }
+.home-map-panel--fullscreen .home-map-fullscreen-btn {
+  top: max(14px, calc(env(safe-area-inset-top) + 10px));
+  right: max(14px, calc(env(safe-area-inset-right) + 10px));
+}
+/* Skjul bottom-nav når kartet er fullscreen (selv om den uansett er bak) */
+body:has(.home-map-panel--fullscreen) .bottom-nav { display: none; }
 
 /* ─── Light mode overrides for new components ─────────────── */
 [data-theme="light"] .venue-card { background: rgba(255,255,255,0.92); }

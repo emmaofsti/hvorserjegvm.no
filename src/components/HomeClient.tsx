@@ -151,7 +151,12 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
           mapFullscreen ? "home-map-panel--fullscreen" : ""
         }`}
       >
-        <VenuesMap venues={filtered} userLocation={userLocation} highlightId={highlightId} />
+        <VenuesMap
+          venues={filtered}
+          userLocation={userLocation}
+          highlightId={highlightId}
+          resizeSignal={mapFullscreen ? 1 : 0}
+        />
 
         {/* Fullscreen toggle (mobile only) */}
         <button

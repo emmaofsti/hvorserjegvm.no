@@ -48,9 +48,13 @@ interface MapProps {
   highlightId?: string | null;
   defaultCenter?: { lat: number; lng: number };
   defaultZoom?: number;
+  /** Toggles signal to invalidate map size (when container changes). */
+  resizeSignal?: number;
 }
 
-export default function VenuesMap({ venues, userLocation, highlightId, defaultCenter, defaultZoom }: MapProps) {
+export default function VenuesMap({
+  venues, userLocation, highlightId, defaultCenter, defaultZoom, resizeSignal,
+}: MapProps) {
   const mapRef = useRef<L.Map | null>(null);
 
   useEffect(() => {
@@ -60,6 +64,29 @@ export default function VenuesMap({ venues, userLocation, highlightId, defaultCe
       mapRef.current.flyTo([v.lat, v.lng], 15, { duration: 0.5 });
     }
   }, [highlightId, venues]);
+
+  // Re-render Leaflet when container size changes (e.g. fullscreen toggle).
+  // Leaflet doesn't auto-detect parent size changes — we must call invalidateSize.
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const m = mapRef.current;
+    // First tick: let CSS finish, then invalidate (twice for safety on iOS)
+    const t1 = window.setTimeout(() => m.invalidateSize(), 60);
+    const t2 = window.setTimeout(() => m.invalidateSize(), 320);
+    return () => { window.clearTimeout(t1); window.clearTimeout(t2); };
+  }, [resizeSignal]);
+
+  // Also resize on actual window resize (rotation, devtools, etc)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handler = () => mapRef.current?.invalidateSize();
+    window.addEventListener("resize", handler);
+    window.addEventListener("orientationchange", handler);
+    return () => {
+      window.removeEventListener("resize", handler);
+      window.removeEventListener("orientationchange", handler);
+    };
+  }, []);
 
   const center: [number, number] = defaultCenter
     ? [defaultCenter.lat, defaultCenter.lng]

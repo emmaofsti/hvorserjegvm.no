@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { getMatch, getMatches, getVenues } from "@/lib/data";
 import { formatDate } from "@/lib/utils";
 import MatchVenuesClient from "@/components/MatchVenuesClient";
+import MatchFavoriteButton from "@/components/MatchFavoriteButton";
 import { Icon } from "@/components/icons";
 import { Stat } from "@/components/ui";
 
@@ -39,7 +40,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-5 sm:py-8">
-      <nav className="mb-5 text-sm">
+      <nav className="mb-5 flex items-center justify-between gap-3 text-sm">
         <Link
           href="/kamper"
           className="lg-capsule lg-energize inline-flex items-center gap-1.5 px-3.5 py-2 text-[13px] text-slate-300 bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.07] hover:text-slate-100"
@@ -47,6 +48,7 @@ export default async function Page({ params }: PageProps) {
           <Icon.ChevronRight size={13} strokeWidth={2.4} style={{ transform: "rotate(180deg)" }} />
           Alle kamper
         </Link>
+        <MatchFavoriteButton slug={match.slug} />
       </nav>
 
       {/* Match header — editorial moment */}

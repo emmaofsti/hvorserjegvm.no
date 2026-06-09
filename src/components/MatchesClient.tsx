@@ -6,6 +6,7 @@ import type { Match, Stage } from "@/lib/types";
 import { formatKickoff } from "@/lib/utils";
 import { Input, Select, Card, CardBody, Badge } from "./ui";
 import { Icon } from "./icons";
+import { useFavoriteMatches } from "@/lib/useFavoriteMatches";
 
 const STAGES: ("Alle" | Stage)[] = [
   "Alle",
@@ -56,11 +57,14 @@ export default function MatchesClient({ matches }: { matches: Match[] }) {
   const [stage, setStage] = useState<(typeof STAGES)[number]>("Alle");
   const [group, setGroup] = useState<string>("Alle");
   const [upcomingOnly, setUpcomingOnly] = useState(true);
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const { isFavorite, toggleFavorite, favoritesCount } = useFavoriteMatches();
 
   const now = new Date();
 
   const filtered = useMemo(() => {
     return matches.filter((m) => {
+      if (favoritesOnly && !isFavorite(m.slug)) return false;
       if (stage !== "Alle" && m.stage !== stage) return false;
       if (group !== "Alle" && m.group !== group) return false;
       if (search) {
@@ -73,7 +77,7 @@ export default function MatchesClient({ matches }: { matches: Match[] }) {
       }
       return true;
     });
-  }, [matches, search, stage, group, upcomingOnly, now]);
+  }, [matches, search, stage, group, upcomingOnly, favoritesOnly, isFavorite, now]);
 
   const byDate = useMemo(() => {
     const m = groupBy(filtered, (x) => x.date);
@@ -135,6 +139,23 @@ export default function MatchesClient({ matches }: { matches: Match[] }) {
             Kommende
           </label>
         </div>
+        {favoritesCount > 0 && (
+          <div className="mt-3">
+            <button
+              type="button"
+              onClick={() => setFavoritesOnly((s) => !s)}
+              className={`lg-capsule lg-energize inline-flex items-center gap-2 px-3.5 py-2 text-[13px] font-medium ${
+                favoritesOnly
+                  ? "lg-glass-accent"
+                  : "bg-white/[0.03] border border-white/[0.08] text-slate-200 hover:bg-white/[0.07]"
+              }`}
+            >
+              <Icon.Heart size={14} strokeWidth={2} fill={favoritesOnly ? "currentColor" : "none"} />
+              Kun favoritter
+              <span className="tnum text-[11px] opacity-80">({favoritesCount})</span>
+            </button>
+          </div>
+        )}
       </section>
 
       {/* Match list */}
@@ -152,42 +173,62 @@ export default function MatchesClient({ matches }: { matches: Match[] }) {
               </h2>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {ms.map((m) => (
-                <Link key={m.id} href={`/kamp/${m.slug}`} className="block group">
-                  <Card>
-                    <CardBody className="space-y-3">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <span className="tnum text-[13px] font-medium text-slate-400">
-                          {formatKickoff(m.date, m.kickoff)}
-                        </span>
-                        <div className="flex items-center gap-1 flex-wrap justify-end">
-                          {m.norwayMatch && <Badge tone="red">🇳🇴 Norge</Badge>}
-                          {isHighDemand(m) && (
-                            <Badge tone="yellow">
-                              <Icon.Flame size={12} strokeWidth={2} /> Høy
-                            </Badge>
-                          )}
-                          <Badge tone="zinc">{m.stage}</Badge>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between gap-2 text-base font-semibold tracking-tight text-slate-100 sm:text-lg">
-                        <span className="truncate">{m.home}</span>
-                        <span className="shrink-0 eyebrow !mb-0">vs</span>
-                        <span className="truncate text-right">{m.away}</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-2 text-[12px] text-slate-500">
-                        <span>{m.group ? `Gruppe ${m.group}` : ""}</span>
-                        {m.tvChannel && (
-                          <span className="inline-flex items-center gap-1.5 text-slate-400">
-                            <Icon.Tv size={12} strokeWidth={2} />
-                            <span>{m.tvChannel}</span>
-                          </span>
-                        )}
-                      </div>
-                    </CardBody>
-                  </Card>
-                </Link>
-              ))}
+              {ms.map((m) => {
+                const fav = isFavorite(m.slug);
+                return (
+                  <div key={m.id} className="relative">
+                    {/* Favorite heart — overlay on card */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toggleFavorite(m.slug);
+                      }}
+                      className={`absolute top-2 right-2 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/45 backdrop-blur-sm transition-all active:scale-95 ${
+                        fav ? "text-red-400" : "text-white/70 hover:text-white"
+                      }`}
+                      aria-label={fav ? "Fjern fra favoritter" : "Legg til som favoritt"}
+                    >
+                      <Icon.Heart size={16} strokeWidth={2} fill={fav ? "currentColor" : "none"} />
+                    </button>
+                    <Link href={`/kamp/${m.slug}`} className="block group">
+                      <Card>
+                        <CardBody className="space-y-3">
+                          <div className="flex items-baseline justify-between gap-2 pr-12">
+                            <span className="tnum text-[13px] font-medium text-slate-400">
+                              {formatKickoff(m.date, m.kickoff)}
+                            </span>
+                            <div className="flex items-center gap-1 flex-wrap justify-end">
+                              {m.norwayMatch && <Badge tone="red">🇳🇴 Norge</Badge>}
+                              {isHighDemand(m) && (
+                                <Badge tone="yellow">
+                                  <Icon.Flame size={12} strokeWidth={2} /> Høy
+                                </Badge>
+                              )}
+                              <Badge tone="zinc">{m.stage}</Badge>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between gap-2 text-base font-semibold tracking-tight text-slate-100 sm:text-lg">
+                            <span className="truncate">{m.home}</span>
+                            <span className="shrink-0 eyebrow !mb-0">vs</span>
+                            <span className="truncate text-right">{m.away}</span>
+                          </div>
+                          <div className="flex items-center justify-between gap-2 text-[12px] text-slate-500">
+                            <span>{m.group ? `Gruppe ${m.group}` : ""}</span>
+                            {m.tvChannel && (
+                              <span className="inline-flex items-center gap-1.5 text-slate-400">
+                                <Icon.Tv size={12} strokeWidth={2} />
+                                <span>{m.tvChannel}</span>
+                              </span>
+                            )}
+                          </div>
+                        </CardBody>
+                      </Card>
+                    </Link>
+                  </div>
+                );
+              })}
             </div>
           </div>
         ))}
