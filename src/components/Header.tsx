@@ -10,7 +10,10 @@ export default function Header() {
   const { favoritesCount } = useFavorites();
 
   return (
-    <header className="sticky top-0 z-30 lg-glass-heavy">
+    <header
+      className="sticky top-0 z-30 lg-glass-heavy"
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
+    >
       <div className="mx-auto flex max-w-[1800px] items-center justify-between gap-3 px-4 py-2.5 sm:py-3">
         <Link href="/" className="flex items-center gap-2.5 lg-energize lg-capsule -mx-2 px-2 py-1">
           <Image

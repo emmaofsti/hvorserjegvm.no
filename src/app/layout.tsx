@@ -50,6 +50,20 @@ export const metadata: Metadata = {
     statusBarStyle: "black-translucent",
     title: "hvorserjegvm.no",
   },
+  // Icons håndteres av Next.js sin file-convention (src/app/icon.jpg,
+  // apple-icon.jpg, opengraph-image.jpg) — den setter <link rel=…>
+  // automatisk basert på filer i app-mappa.
+};
+
+// Schema.org Organization — gjør at Google viser logoen i søkeresultater
+const ORG_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "hvorserjegvm.no",
+  url: SITE_URL,
+  logo: `${SITE_URL}/icon.jpg`,
+  description: DESCRIPTION,
+  sameAs: ["https://hvorserjegvm.no"],
 };
 
 const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark')}catch(e){document.documentElement.setAttribute('data-theme','dark')}})();`;
@@ -60,6 +74,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         {/* Pre-hydration theme setter — runs synchronously before paint */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        {/* Schema.org Organization — for Google search result logo */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ORG_SCHEMA) }}
+        />
       </head>
       <body className="flex min-h-full flex-col">
         <Header />
