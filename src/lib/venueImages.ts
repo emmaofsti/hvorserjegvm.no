@@ -28,10 +28,16 @@ function ensureHttps(url: string): string {
  */
 const manualOverrides: Record<string, string> = {
   // ─────────────────────────────────────────────────────────
-  // 1) Brukerens egne bilder (i /public/venues/)
-  // Disse vinner over alt — det brukeren har lastet opp manuelt.
+  // 1) AI-genererte illustrasjoner (i /public/venues/)
+  // Disse er KI-bilder, ikke ekte foto. Markeres med
+  // "AI-illustrasjon"-badge der de vises.
+  //
+  // To bilder fjernet juni 2026 pga. KI-rekonstruerte
+  // varemerker (Coca-Cola, Liverpool FC, Guinness, Jameson)
+  // — erstattet med nøytrale stock-bilder uten merker:
+  //   - kongens-gate-fotballfesten (hadde Coca-Cola + Carlsberg)
+  //   - ost-stadionpub (hadde Guinness + Jameson + Liverpool FC)
   // ─────────────────────────────────────────────────────────
-  "kongens-gate-fotballfesten": "/venues/kongens-gate-fotballfesten.jpg",
   "ullevaal-stadion-fotballfesten": "/venues/ullevaal-stadion-fotballfesten.jpg",
   "fotball-i-sentrum-spikersuppa": "/venues/fotball-i-sentrum-spikersuppa.jpg",
   "fotballeventyret-grunerhallen": "/venues/fotballeventyret-grunerhallen.jpg",
@@ -41,7 +47,14 @@ const manualOverrides: Record<string, string> = {
   "bohemen": "/venues/bohemen.jpg",
   "proud-mary": "/venues/proud-mary.jpg",
   "taket-steen-strom": "/venues/taket-steen-strom.jpg",
-  "ost-stadionpub": "/venues/ost-stadionpub.jpg",
+
+  // Erstatninger for fjernede AI-bilder. Nøytrale Unsplash-foto
+  // som matcher venuet i type (fan zone / sportsbar). Ingen
+  // varemerker, ingen identifiserbare brands.
+  "kongens-gate-fotballfesten":
+    "https://images.unsplash.com/photo-1577223625816-7546f13df25d?w=900&h=560&fit=crop&q=80",
+  "ost-stadionpub":
+    "https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=900&h=560&fit=crop&q=80",
 
   // ─────────────────────────────────────────────────────────
   // 2) Ekte hero-bilder hentet fra venuens egen side
@@ -170,4 +183,18 @@ export function getVenueImageUrl(venueId: string, category: string): string {
 
   const pool = unsplashByCategory[category] ?? unsplashByCategory.pub;
   return pickVariation(venueId, pool);
+}
+
+/**
+ * Er dette bildet AI-generert?
+ *
+ * Alle filer under /venues/ er KI-illustrasjoner laget for siden.
+ * Eksterne URLer (Unsplash, scraped og:image fra venuene selv) er
+ * ekte foto eller lisensiert stock.
+ *
+ * Brukes for å vise "AI-illustrasjon"-badge der bildet rendres —
+ * krav fra Markedsføringsloven §6 og kommende EU AI Act.
+ */
+export function isAIGeneratedImage(url: string): boolean {
+  return url.startsWith("/venues/");
 }
