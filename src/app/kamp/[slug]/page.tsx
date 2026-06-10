@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getMatch, getMatches, getVenues } from "@/lib/data";
+import type { Match } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 import MatchVenuesClient from "@/components/MatchVenuesClient";
 import MatchFavoriteButton from "@/components/MatchFavoriteButton";
@@ -20,13 +21,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const match = getMatch(slug);
   if (!match) return { title: "Kamp ikke funnet" };
-  const title = `${match.home} – ${match.away} i Oslo`;
-  const description = `Hvor kan du se ${match.home} mot ${match.away} (${match.stage}, ${formatDate(match.date)}, kl. ${match.kickoff} norsk tid) på storskjerm i Oslo?`;
+  /* SEO-tuned title: leads with the primary search phrase
+     ("Hvor ser jeg [Lag1] - [Lag2] i Oslo") which matches how people
+     actually google. Norge-kamper få et 🇳🇴 i title for click-through. */
+  const flagPrefix = match.norwayMatch ? "🇳🇴 " : "";
+  const title = `${flagPrefix}Hvor ser jeg ${match.home} – ${match.away} i Oslo?`;
+  const description = `Hvor kan du se ${match.home} mot ${match.away} (${match.stage}, ${formatDate(match.date)}, kl. ${match.kickoff} norsk tid) på storskjerm i Oslo? Komplett oversikt over fan zones, sportsbarer og puber${match.tvChannel ? ` — sendes på ${match.tvChannel}` : ""}.`;
   return {
     title,
     description,
     alternates: { canonical: `https://hvorserjegvm.no/kamp/${match.slug}` },
-    openGraph: { title, description, type: "article" },
+    openGraph: { title, description, type: "article", url: `https://hvorserjegvm.no/kamp/${match.slug}` },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
@@ -114,6 +120,69 @@ export default async function Page({ params }: PageProps) {
 
       <MatchVenuesClient match={match} venues={venues} />
 
+      {/* FAQ — visible accordion. Rich-snippet eligible via FAQPage schema.
+          Questions match how people actually google before a kickoff. */}
+      <section className="mt-12 mb-10">
+        <h2 className="display display-sm text-slate-100 mb-5">Vanlige spørsmål</h2>
+        <div className="space-y-3 max-w-3xl">
+          {buildFaqs(match).map((f, i) => (
+            <details
+              key={i}
+              className="lg-surface group p-5"
+              style={{ borderRadius: "var(--lg-r-l)" }}
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-[15px] font-medium text-slate-100">
+                {f.q}
+                <Icon.ChevronDown
+                  size={16}
+                  strokeWidth={2.2}
+                  className="shrink-0 text-slate-400 transition-transform group-open:rotate-180"
+                />
+              </summary>
+              <div className="mt-3 text-[14.5px] text-slate-300 leading-relaxed">
+                {f.a}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      {/* Related guides — internal-link graph hook. Pumps PageRank to the
+          guide pages and gives users a path to broader content. */}
+      <section className="mb-8 max-w-3xl">
+        <h2 className="eyebrow mb-3">Relaterte guider</h2>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/guide/hvor-se-vm-i-oslo"
+            className="lg-capsule inline-flex items-center gap-1.5 px-3.5 py-2 text-[13px] bg-white/[0.05] border border-white/[0.08] text-slate-200 hover:bg-white/[0.09]"
+          >
+            Komplett VM-guide for Oslo
+          </Link>
+          {match.norwayMatch && (
+            <Link
+              href="/guide/norge-pa-storskjerm-oslo"
+              className="lg-capsule inline-flex items-center gap-1.5 px-3.5 py-2 text-[13px] bg-white/[0.05] border border-white/[0.08] text-slate-200 hover:bg-white/[0.09]"
+            >
+              Norges kamper på storskjerm
+            </Link>
+          )}
+          <Link
+            href="/guide/gratis-vm-oslo"
+            className="lg-capsule inline-flex items-center gap-1.5 px-3.5 py-2 text-[13px] bg-white/[0.05] border border-white/[0.08] text-slate-200 hover:bg-white/[0.09]"
+          >
+            Gratis VM i Oslo
+          </Link>
+          <Link
+            href="/guide/billig-ol-vm-oslo"
+            className="lg-capsule inline-flex items-center gap-1.5 px-3.5 py-2 text-[13px] bg-white/[0.05] border border-white/[0.08] text-slate-200 hover:bg-white/[0.09]"
+          >
+            Ølpriser i Oslo
+          </Link>
+        </div>
+      </section>
+
+      {/* JSON-LD: SportsEvent + FAQPage + BreadcrumbList.
+          All three give Google distinct rich-result eligibility. */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -132,9 +201,91 @@ export default async function Page({ params }: PageProps) {
               { "@type": "SportsTeam", name: match.home },
               { "@type": "SportsTeam", name: match.away },
             ],
-          }),
+          }).replace(/</g, "\\u003c"),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: buildFaqs(match).map((f) => ({
+              "@type": "Question",
+              name: f.q,
+              acceptedAnswer: { "@type": "Answer", text: f.a },
+            })),
+          }).replace(/</g, "\\u003c"),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Hjem", item: "https://hvorserjegvm.no" },
+              { "@type": "ListItem", position: 2, name: "Kamper", item: "https://hvorserjegvm.no/kamper" },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: `${match.home} – ${match.away}`,
+                item: `https://hvorserjegvm.no/kamp/${match.slug}`,
+              },
+            ],
+          }).replace(/</g, "\\u003c"),
         }}
       />
     </div>
   );
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+ * Per-match FAQ generator.
+ *
+ * The questions are deliberately phrased the way people google: "hvor ser jeg
+ * X mot Y", "hvilken kanal sender X-Y", "når starter X mot Y". Each one is
+ * a real long-tail keyword.
+ * ──────────────────────────────────────────────────────────── */
+function buildFaqs(match: Match): { q: string; a: string }[] {
+  const m = match;
+  const dateText = formatDate(m.date);
+  const teams = `${m.home} – ${m.away}`;
+  const teamsVs = `${m.home} mot ${m.away}`;
+  const stageLabel = m.stage === "Gruppespill" ? `gruppespillet${m.group ? " (Gruppe " + m.group + ")" : ""}` : m.stage.toLowerCase();
+  const faqs: { q: string; a: string }[] = [];
+
+  faqs.push({
+    q: `Hvor kan jeg se ${teamsVs} i Oslo?`,
+    a: `${teams} (${stageLabel}, ${dateText} kl. ${m.kickoff} norsk tid) vises på storskjerm i alle de store fan zonene i Oslo — Spikersuppa, Lekter'n, Fotball i Parken og Jordal Amfi — samt et stort antall sportsbarer og puber. Se hele lista lenger opp på siden.`,
+  });
+
+  if (m.tvChannel) {
+    faqs.push({
+      q: `Hvilken kanal sender ${teamsVs}?`,
+      a: `${teams} sendes på ${m.tvChannel} i Norge. ${m.tvChannel.includes("/") ? "Begge kanaler er gratis på lineær TV." : "Kanalen er gratis på lineær TV."} Kampen kan også streames via ${m.tvChannel.includes("NRK") ? "NRK TV-appen" : "TV 2 Play"}.`,
+    });
+  }
+
+  faqs.push({
+    q: `Når starter ${teamsVs}?`,
+    a: `${teams} starter ${dateText} kl. ${m.kickoff} norsk tid${m.stadium ? `. Kampen spilles på ${m.stadium}${m.city ? " i " + m.city : ""}.` : "."}`,
+  });
+
+  if (m.norwayMatch) {
+    faqs.push({
+      q: "Hvor er den beste stemningen for Norges kamper i Oslo?",
+      a: "Spikersuppa midt i sentrum og Fotball i Parken har den største stemningen for Norges kamper. Begge er store fan zones med tusenvis av fans. For en mer intim opplevelse kan du prøve puber som Lannisters, Old Irish eller Beer Palace.",
+    });
+  }
+
+  if (m.stage !== "Gruppespill") {
+    faqs.push({
+      q: `Krever ${teamsVs} reservasjon?`,
+      a: "Knockout-kamper trekker store mengder folk. På sportsbarer og puber bør du reservere bord. På de gratis fan zonene (Spikersuppa, Lekter'n) er det først til mølla — møt opp i god tid.",
+    });
+  }
+
+  return faqs;
 }
