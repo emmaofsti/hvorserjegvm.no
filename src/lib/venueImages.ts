@@ -41,6 +41,7 @@ const manualOverrides: Record<string, string> = {
   "ullevaal-stadion-fotballfesten": "/venues/ullevaal-stadion-fotballfesten.jpg",
   "fotball-i-sentrum-spikersuppa": "/venues/fotball-i-sentrum-spikersuppa.jpg",
   "fotballeventyret-grunerhallen": "/venues/fotballeventyret-grunerhallen.jpg",
+  "fotball-pa-jordal": "/venues/fotball-pa-jordal.jpg",
   "old-irish-majorstuen": "/venues/old-irish-majorstuen.jpg",
   "magneten": "/venues/magneten.jpg",
   "haandtryk": "/venues/haandtryk.jpg",
@@ -61,8 +62,6 @@ const manualOverrides: Record<string, string> = {
   // ─────────────────────────────────────────────────────────
   "fotball-i-parken":
     "https://cdn.prod.website-files.com/6909dfabc111725a3656f965/6914a6197ebd9dc1444e4b70_fotballiparken_02.avif",
-  "fotball-pa-jordal":
-    "https://www.fotballpajordal.no/media/hero-med-lys.jpg",
   "lekter-n":
     "https://vmlektern.lovable.app/assets/hero-lektern-B0krEp8T.jpg",
   "vippa":
