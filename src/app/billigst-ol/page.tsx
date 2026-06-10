@@ -54,7 +54,8 @@ export default function BilligstOlPage() {
         Tilbake til alle steder
       </Link>
 
-      {/* Hero — nøytral, forbrukerinformasjonsrammet */}
+      {/* Hero — slanket. Den lange intro-paragrafen og 18+-disclaimeren
+          er flyttet til bunnen så tabellen kommer raskere i view. */}
       <header className="mb-6">
         <p className="eyebrow mb-3">
           Forbrukerinformasjon · Oppdatert {cheapest.beerPriceUpdated}
@@ -62,25 +63,7 @@ export default function BilligstOlPage() {
         <h1 className="display display-lg text-slate-50">
           Ølpriser ved VM-stedene<br />i Oslo
         </h1>
-        <p className="mt-5 text-[16px] leading-relaxed text-slate-300 max-w-2xl">
-          Denne siden gjengir registrerte priser på 0,5 L pils ved venuer som
-          viser Fotball-VM 2026 på storskjerm. Tallene er hentet fra{" "}
-          <a
-            href="https://www.pilsguiden.no/oslo"
-            target="_blank"
-            rel="noreferrer"
-            className="underline underline-offset-2 text-slate-200 hover:text-slate-50"
-          >
-            pilsguiden.no
-          </a>{" "}
-          og presenteres som offentlig tilgjengelig forbrukerinformasjon.
-        </p>
       </header>
-
-      {/* 18+ disclaimer — første ting under hero */}
-      <div className="mb-8">
-        <AlcoholDisclaimer />
-      </div>
 
       {/* Pris-statistikk — nøytrale tall, ingen drama */}
       <section
@@ -214,6 +197,13 @@ export default function BilligstOlPage() {
           <Icon.MapPin size={13} strokeWidth={2.4} /> Åpne kartet
         </Link>
       </section>
+
+      {/* 18+ disclaimer — flyttet hit fra rett under hero, så tabellen vises
+          raskere. Forbrukerinformasjonen er fortsatt tydelig synlig
+          (Alkoholloven §9-2). */}
+      <div className="mb-6">
+        <AlcoholDisclaimer />
+      </div>
 
       {/* Metode + kildeangivelse */}
       <section className="border-t border-white/[0.06] pt-6 text-[12.5px] text-slate-500 leading-relaxed">
