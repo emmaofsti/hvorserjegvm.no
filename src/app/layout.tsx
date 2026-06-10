@@ -1,11 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Barlow, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+/* Barlow er hovedfont (body, wordmark, UI). Bebas Neue er display-font
+   for sport-energi på store overskrifter — brukes via CSS-variabelen
+   --font-display der det gir mening. */
+const barlow = Barlow({
+  variable: "--font-sans-base",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+const bebasNeue = Bebas_Neue({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
 
 const SITE_URL = "https://hvorserjegvm.no";
 const TITLE = "hvorserjegvm.no — Hvor kan du se Fotball-VM 2026 i Oslo?";
@@ -73,7 +86,7 @@ const THEME_INIT_SCRIPT = `document.documentElement.setAttribute('data-theme','d
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="nb" data-theme="dark" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="nb" data-theme="dark" className={`${barlow.variable} ${bebasNeue.variable} h-full antialiased`}>
       <head>
         {/* Pre-hydration theme setter — runs synchronously before paint */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
