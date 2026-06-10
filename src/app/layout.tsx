@@ -86,8 +86,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <footer className="border-t border-white/[0.06] py-6 lg:py-8 text-[12px] text-[var(--text-muted)] bottom-safe hidden lg:block">
           <div className="mx-auto max-w-7xl px-4 space-y-2">
             <p className="leading-relaxed">
-              hvorserjegvm.no — uavhengig guide til VM 2026 i Oslo. Data hentet fra venuers nettsider og
-              offentlige kilder per juni 2026.{" "}
+              hvorserjegvm.no — uavhengig hobbyprosjekt. Ikke tilknyttet FIFA eller NFF.
+              Data hentet fra venuers nettsider og offentlige kilder per juni 2026.{" "}
+              <a className="underline underline-offset-4 hover:text-slate-200" href="/om">
+                Om siden
+              </a>
+              {" · "}
+              <a className="underline underline-offset-4 hover:text-slate-200" href="/guide">
+                Alle guider
+              </a>
+              {" · "}
+              <a className="underline underline-offset-4 hover:text-slate-200" href="/endre">
+                Endre eller fjerne info
+              </a>
+              {" · "}
               <a className="underline underline-offset-4 hover:text-slate-200" href="/personvern">
                 Personvern
               </a>
@@ -114,12 +126,26 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Mobil-footer: kun nødvendige lenker, plass for bottom-nav */}
         <div className="lg:hidden border-t border-white/[0.06] px-4 py-5 pb-24 text-center text-[11px] text-slate-500 space-y-1.5 bottom-safe">
           <p>
+            <a className="underline underline-offset-4 hover:text-slate-300" href="/om">
+              Om
+            </a>
+            {" · "}
+            <a className="underline underline-offset-4 hover:text-slate-300" href="/guide">
+              Guider
+            </a>
+            {" · "}
+            <a className="underline underline-offset-4 hover:text-slate-300" href="/endre">
+              Endre info
+            </a>
+            {" · "}
             <a className="underline underline-offset-4 hover:text-slate-300" href="/personvern">
               Personvern
             </a>
-            {" · "}
-            <a className="underline underline-offset-4 hover:text-slate-300" href="https://www.pilsguiden.no/oslo" target="_blank" rel="noreferrer">
-              Ølpriser fra pilsguiden.no
+          </p>
+          <p className="text-slate-600">
+            Kilde for ølpriser:{" "}
+            <a className="underline underline-offset-4 hover:text-slate-400" href="https://www.pilsguiden.no/oslo" target="_blank" rel="noreferrer">
+              pilsguiden.no
             </a>
           </p>
           <p>Laget med hjelp av AI. Verifiser kritisk info selv.</p>
