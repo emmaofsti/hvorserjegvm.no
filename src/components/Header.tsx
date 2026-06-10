@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Icon } from "./icons";
 import { useFavorites } from "@/lib/useFavorites";
 
@@ -14,15 +13,7 @@ export default function Header() {
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       <div className="mx-auto flex max-w-[1800px] items-center justify-between gap-3 px-4 py-2.5 sm:py-3">
-        <Link href="/" className="flex items-center gap-2.5 lg-energize lg-capsule -mx-2 px-2 py-1">
-          <Image
-            src="/logo.jpg"
-            alt="hvorserjegvm.no logo"
-            width={36}
-            height={36}
-            className="rounded-xl shadow-sm shadow-black/40 ring-1 ring-white/10"
-            priority
-          />
+        <Link href="/" className="lg-energize lg-capsule -mx-2 px-2 py-1">
           <span className="text-base font-bold tracking-tight text-slate-100 sm:text-lg">
             hvorserjegvm.no
           </span>
