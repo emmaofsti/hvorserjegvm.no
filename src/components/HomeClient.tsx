@@ -204,7 +204,14 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
         {/* Header */}
         <div className="home-list-header">
           <div>
-            <h1 className="text-[26px] sm:text-[30px] font-bold tracking-tight text-slate-50 leading-tight">
+            <h1
+              className="text-[32px] sm:text-[40px] text-slate-50 leading-[1.05]"
+              style={{
+                fontFamily: "var(--font-display), Impact, sans-serif",
+                fontWeight: 400,
+                letterSpacing: "0.015em",
+              }}
+            >
               Hvor ser jeg VM 2026?
             </h1>
             <p className="text-[13px] text-slate-400 mt-1">
