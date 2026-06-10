@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import ThemeToggle from "./ThemeToggle";
 import { Icon } from "./icons";
 import { useFavorites } from "@/lib/useFavorites";
 
@@ -52,9 +51,6 @@ export default function Header() {
               </span>
             )}
           </Link>
-          <span className="ml-1.5">
-            <ThemeToggle />
-          </span>
         </nav>
       </div>
     </header>

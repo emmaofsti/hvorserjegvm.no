@@ -17,10 +17,10 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: "cover",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fafaf9" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0c" },
-  ],
+  /* Siden er dark-only. Vi sender samme farge til både light- og dark-
+     prefererte enheter, slik at iOS-statuslinjen matcher selv om brukerens
+     OS er i light mode. */
+  themeColor: "#0a0a0c",
 };
 
 export const metadata: Metadata = {
@@ -66,7 +66,10 @@ const ORG_SCHEMA = {
   sameAs: ["https://hvorserjegvm.no"],
 };
 
-const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('theme');document.documentElement.setAttribute('data-theme',t==='light'?'light':'dark')}catch(e){document.documentElement.setAttribute('data-theme','dark')}})();`;
+/* Dark-only — vi setter alltid data-theme="dark" og ignorerer både
+   localStorage og prefers-color-scheme. Brukere med light mode på
+   OS-nivå får siden i dark uansett. */
+const THEME_INIT_SCRIPT = `document.documentElement.setAttribute('data-theme','dark');`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
