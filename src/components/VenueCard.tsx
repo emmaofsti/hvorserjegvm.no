@@ -6,7 +6,7 @@ import { Badge } from "./ui";
 import { Icon } from "./icons";
 import { haversineKm, walkingMinutes } from "@/lib/utils";
 import { useFavorites } from "@/lib/useFavorites";
-import { getVenueImageUrl } from "@/lib/venueImages";
+import { getVenueImageUrl, isAIGeneratedImage } from "@/lib/venueImages";
 
 interface VenueCardProps {
   venue: Venue;
@@ -24,6 +24,7 @@ export default function VenueCard({ venue, userLocation, cheapestBeer, onHover, 
   const { isFavorite, toggleFavorite } = useFavorites();
   const fav = isFavorite(venue.id);
   const imageUrl = venue.imageUrl ?? getVenueImageUrl(venue.id, venue.category);
+  const isAI = isAIGeneratedImage(imageUrl);
 
   let distLabel: string | null = null;
   if (userLocation && venue.lat && venue.lng) {
@@ -56,12 +57,25 @@ export default function VenueCard({ venue, userLocation, cheapestBeer, onHover, 
         <div className="venue-card-image">
           <img
             src={imageUrl}
-            alt={venue.name}
+            alt={isAI ? `${venue.name} (AI-illustrasjon)` : venue.name}
             loading="lazy"
             className="venue-card-img"
           />
           {/* Gradient overlay */}
           <div className="venue-card-image-overlay" />
+
+          {/* AI-illustrasjon badge — synlig merking ihht. Markedsføringsloven §6
+              og kommende EU AI Act. Plassert øverst venstre for å være synlig
+              uten å konkurrere med favoritt-hjertet (øverst høyre). */}
+          {isAI && (
+            <span
+              className="absolute left-2 top-2 z-10 inline-flex items-center gap-1 rounded-md bg-black/65 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white/90 backdrop-blur-sm"
+              title="Dette bildet er en AI-generert illustrasjon, ikke et ekte foto av venuet"
+              aria-label="AI-generert illustrasjon"
+            >
+              AI-illustrasjon
+            </span>
+          )}
 
           {/* Favorite heart - top right */}
           <button
@@ -132,7 +146,8 @@ export default function VenueCard({ venue, userLocation, cheapestBeer, onHover, 
               >
                 <Icon.Beer size={14} strokeWidth={2} />
                 <span className="tnum">{venue.beerPrice}</span> kr
-                {isCheapest && <span className="venue-card-beer-tag">Billigst!</span>}
+                {/* "Billigst!"-badge fjernet — promosignal som kan rammes av
+                    Alkoholloven §9-2. Pris vises nøytralt uten ranking-overlay. */}
               </span>
             ) : (
               <span />

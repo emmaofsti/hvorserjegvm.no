@@ -210,33 +210,36 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
             <p className="text-[13px] text-slate-400 mt-1">
               Finn de beste stedene å se kampene i Oslo
             </p>
+            {/* Juridisk disclaimer-line — synlig på forsiden uten å ødelegge
+                visuelt fokus. Signaliserer: ikke offisiell, oppdatert i juni
+                2026, hobbyprosjekt. /om-lenken er flyttet til footer for
+                mer diskret plassering. */}
+            <p className="mt-2 text-[11px] text-slate-500 leading-snug">
+              Uavhengig hobbyprosjekt · ikke tilknyttet FIFA eller NFF · data per juni 2026.
+            </p>
           </div>
         </div>
 
-        {/* Beer-price spotlight */}
-        {cheapestBeer !== null && (() => {
-          const winner = venues
-            .filter((v) => v.beerPrice === cheapestBeer)
-            .sort((a, b) => a.name.localeCompare(b.name))[0];
-          return winner ? (
-            <div className="px-4 pb-2">
-              <Link
-                href="/billigst-ol"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-amber-400/[0.08] border border-amber-400/25 hover:bg-amber-400/[0.12] transition-colors"
-              >
-                <Icon.Beer size={18} strokeWidth={2} className="shrink-0 text-amber-300" />
-                <span className="min-w-0 flex-1 text-[13px]">
-                  <span className="font-semibold text-amber-100">Billigst pils nå:</span>{" "}
-                  <span className="text-slate-100 truncate">{winner.name}</span>{" "}
-                  <span className="num-display text-emerald-300">{winner.beerPrice} kr</span>
-                </span>
-                <span className="shrink-0 text-[12px] text-amber-200/80 inline-flex items-center gap-0.5">
-                  Se topp 10 <Icon.ArrowRight size={12} strokeWidth={2.4} />
-                </span>
-              </Link>
-            </div>
-          ) : null;
-        })()}
+        {/* Ølpris-lenke — beholder gult visuelt uttrykk (kjenner igjen som
+            "billigst pils"-vibe), men teksten er nøytral og navngir
+            ingen venuer eller priser. Det er navngivning + pris-rangering
+            på forsiden som er Alkoholloven §9-2-risikoen, ikke fargen. */}
+        {cheapestBeer !== null && (
+          <div className="px-4 pb-2">
+            <Link
+              href="/billigst-ol"
+              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-amber-400/[0.08] border border-amber-400/25 hover:bg-amber-400/[0.12] transition-colors"
+            >
+              <Icon.Beer size={18} strokeWidth={2} className="shrink-0 text-amber-300" />
+              <span className="min-w-0 flex-1 text-[13px] font-semibold text-amber-100">
+                Ølpris-oversikt for VM-stedene
+              </span>
+              <span className="shrink-0 text-[12px] text-amber-200/80 inline-flex items-center gap-0.5">
+                Se <Icon.ArrowRight size={12} strokeWidth={2.4} />
+              </span>
+            </Link>
+          </div>
+        )}
 
         {/* Search */}
         <div className="home-search">

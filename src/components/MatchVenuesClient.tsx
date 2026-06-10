@@ -106,7 +106,7 @@ export default function MatchVenuesClient({ match, venues }: Props) {
             <option value="atmosphere">Best stemning</option>
             <option value="free">Gratis først</option>
             <option value="family">Familievennlig først</option>
-            <option value="beer">Billigst øl først</option>
+            <option value="beer">Lavest ølpris først</option>
           </Select>
         </div>
       </section>
