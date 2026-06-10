@@ -486,6 +486,7 @@ button, a, [role="button"], input, select, label {
 .home-list-header { padding: 16px 16px 8px; }
 .home-search { padding: 0 16px 10px; }
 .home-quick-filters { padding: 0 16px 8px; }
+.home-beerprice { padding: 0 16px 10px; }
 .home-filters-expanded {
   padding: 12px 16px 16px;
   border-top: 1px solid var(--lg-edge-light);

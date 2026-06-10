@@ -49,35 +49,6 @@ export default function Filters({ state, onChange, hasLocation }: FiltersProps) 
           />
         </div>
 
-        {/* Beer price chips */}
-        <div className="mt-4 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible text-sm">
-            <span className="shrink-0 inline-flex items-center gap-1.5 text-slate-400">
-              <Icon.Beer size={15} strokeWidth={2} /> Maks:
-            </span>
-            {[
-              { v: null, l: "Alle" },
-              { v: 80, l: "80 kr" },
-              { v: 100, l: "100 kr" },
-              { v: 120, l: "120 kr" },
-              { v: 140, l: "140 kr" },
-            ].map((opt) => (
-              <button
-                key={opt.l}
-                type="button"
-                onClick={() => set("maxBeerPrice", opt.v)}
-                className={
-                  "lg-capsule lg-energize shrink-0 px-3 py-1.5 text-[12.5px] font-medium " +
-                  (state.maxBeerPrice === opt.v
-                    ? "lg-glass-accent"
-                    : "bg-white/[0.03] border border-white/[0.08] text-slate-300 hover:bg-white/[0.07]")
-                }
-              >
-                <span className="tnum">{opt.l}</span>
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
 
       <div>

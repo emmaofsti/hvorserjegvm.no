@@ -315,6 +315,31 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
           </div>
         </div>
 
+        {/* Ølpris — alltid synlig så folk ikke må åpne "Flere filtre" */}
+        <div className="home-beerprice">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            <span className="shrink-0 inline-flex items-center gap-1.5 text-[12px] text-slate-400">
+              <Icon.Beer size={13} strokeWidth={2} /> Maks ølpris:
+            </span>
+            {[
+              { v: null, l: "Alle" },
+              { v: 80, l: "80 kr" },
+              { v: 100, l: "100 kr" },
+              { v: 120, l: "120 kr" },
+              { v: 140, l: "140 kr" },
+            ].map((opt) => (
+              <button
+                key={opt.l}
+                type="button"
+                onClick={() => setFilters((f) => ({ ...f, maxBeerPrice: opt.v }))}
+                className={`home-chip shrink-0 ${filters.maxBeerPrice === opt.v ? "home-chip--active" : ""}`}
+              >
+                <span className="tnum">{opt.l}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Expandable full filters */}
         {showFilters && (
           <div className="home-filters-expanded">
