@@ -204,7 +204,7 @@ export default function HomeClient({ venues }: { venues: Venue[] }) {
         {/* Header */}
         <div className="home-list-header">
           <div>
-            <h1 className="text-[22px] sm:text-[26px] font-bold tracking-tight text-slate-50 leading-tight">
+            <h1 className="text-[26px] sm:text-[30px] font-bold tracking-tight text-slate-50 leading-tight">
               Hvor ser jeg VM 2026?
             </h1>
             <p className="text-[13px] text-slate-400 mt-1">
