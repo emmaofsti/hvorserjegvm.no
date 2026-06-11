@@ -3,11 +3,11 @@
   "meta": {
     "generated": "2026-06-08",
     "tournament": "FIFA World Cup 2026",
-    "scope": "Oslo (kommune)",
+    "scope": "Oslo (kommune) + utvalgte arrangementer i Bærum",
     "tournamentStarts": "2026-06-11",
     "tournamentEnds": "2026-07-19",
     "primarySource": "https://www.sefotballvm2026.no/oslo",
-    "totalVenues": 43,
+    "totalVenues": 44,
     "notes": "Koordinater er beregnet fra verifisert gateadresse og er omtrentlige (~10–30 m). Geokod på nytt med Nominatim ved bygg for produksjon. Felter som ikke er bekreftet er satt til null — ikke gjettet. Felt 'indoorViewing' lagt til i juni 2026 — bekreftet via kildebeskrivelser per venue. Ølpriser hentet fra pilsguiden.no juni 2026 (0,5 L vanlig pris). Event-pris kan avvike.",
     "categories": {
       "fan_zone": "Stor utendørs/innendørs VM-event med storskjerm",
@@ -1498,6 +1498,45 @@
       "beerPriceVolume": "0.5L",
       "beerPriceSource": "https://www.pilsguiden.no/oslo",
       "beerPriceUpdated": "2026-06-08"
+    },
+    {
+      "id": "folkefesten-kadettangen",
+      "name": "Folkefesten på Kadettangen",
+      "address": "Kadettangen, 1338 Sandvika",
+      "neighborhood": "Sandvika (Bærum)",
+      "lat": 59.8902,
+      "lng": 10.5194,
+      "coordsApproximate": true,
+      "website": "https://www.baerum.kommune.no/",
+      "category": "fan_zone",
+      "showsAllMatches": true,
+      "showsNorwayMatches": true,
+      "alcohol": null,
+      "familyFriendly": true,
+      "outdoorViewing": true,
+      "indoorViewing": false,
+      "requiresReservation": false,
+      "ticketRequired": false,
+      "ticketPrice": null,
+      "beerPrice": null,
+      "beerPriceCurrency": null,
+      "beerPriceVolume": null,
+      "beerPriceSource": null,
+      "beerPriceUpdated": null,
+      "capacity": null,
+      "ageLimit": null,
+      "operator": "Bærum kommune",
+      "description": "Bærum kommunes offisielle VM-arrangement på Kadettangen i Sandvika. Storskjerm-visning av alle kampene fra åpningskampen 11. juni til finalen 19. juli. Gratis, utendørs, et alternativ for vest-Oslo og Bærum.",
+      "sources": [
+        "https://www.baerum.kommune.no/"
+      ],
+      "verified": "secondary",
+      "needsVerification": [
+        "alcohol",
+        "capacity",
+        "exact_address",
+        "opening_hours"
+      ]
     }
   ],
   "excludedFromInitialSet": [
