@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://hvorserjegvm.no/personvern" },
 };
 
-const LAST_UPDATED = "9. juni 2026";
+const LAST_UPDATED = "12. juni 2026";
 
 export default function PersonvernPage() {
   return (
@@ -46,15 +46,20 @@ export default function PersonvernPage() {
           <li className="flex items-start gap-2.5">
             <Icon.Free size={16} strokeWidth={2.2} className="mt-0.5 shrink-0 text-emerald-300" />
             <span>
-              <strong>Ingen sporing.</strong> Vi bruker ikke Google Analytics,
-              Facebook Pixel eller noen tredjeparts sporingsverktøy.
+              <strong>Statistikk kun med samtykke.</strong> Vi bruker Google
+              Analytics for anonym besøksstatistikk, men kun hvis du svarer
+              «Ja» på samtykke-spørsmålet. Svarer du «Nei takk», lastes ingen
+              GA-script og ingen cookies settes. Vi bruker ikke Facebook Pixel
+              eller andre annonse-/sporingsverktøy.
             </span>
           </li>
           <li className="flex items-start gap-2.5">
             <Icon.Free size={16} strokeWidth={2.2} className="mt-0.5 shrink-0 text-emerald-300" />
             <span>
-              <strong>Ingen cookies.</strong> Vi setter ingen cookies, hverken
-              våre egne eller fra tredjepart.
+              <strong>Cookies kun etter samtykke.</strong> Hvis du sier ja til
+              statistikk, setter Google Analytics cookies (
+              <code className="text-[12.5px]">_ga</code> m.fl.) for å skille
+              besøkende fra hverandre. Utover dette setter vi ingen cookies.
             </span>
           </li>
           <li className="flex items-start gap-2.5">
@@ -220,6 +225,12 @@ export default function PersonvernPage() {
         </p>
         <ul className="space-y-2 text-[14px] text-slate-300 leading-relaxed">
           <li>
+            <strong>Google Analytics</strong> — besøksstatistikk, lastes kun
+            hvis du samtykker. Mottar da anonymisert informasjon om
+            sidevisninger, enhetstype og omtrentlig geografisk område. Brukes
+            kun til å forstå hvordan siden brukes.
+          </li>
+          <li>
             <strong>Vercel</strong> — host, kjører siden vår. Logger
             standard server-tekniske data (IP, user-agent, sti) i 30 dager for
             sikkerhet og feilfinning.
@@ -271,9 +282,11 @@ export default function PersonvernPage() {
           Dine rettigheter
         </h2>
         <p className="text-[15px] text-slate-300 leading-relaxed">
-          Siden vi ikke lagrer personopplysninger om deg på vår side, har vi
-          heller ingen data om deg å gi innsyn i, slette eller rette. Du har
-          full kontroll over dine egne lagrede valg via nettleseren.
+          Vi lagrer ingen personopplysninger om deg på egne servere.
+          Besøksstatistikken i Google Analytics er aggregert og kan ikke
+          knyttes til deg som enkeltperson av oss. Du kan blokkere Google
+          Analytics med nettleserutvidelser eller sporingsvern i nettleseren,
+          og du har full kontroll over dine egne lagrede valg via nettleseren.
         </p>
       </section>
 

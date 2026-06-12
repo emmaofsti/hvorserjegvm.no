@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow, Bebas_Neue } from "next/font/google";
+import ConsentGate from "@/components/ConsentGate";
 import "./globals.css";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
@@ -167,6 +168,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <p>Laget med hjelp av AI. Verifiser kritisk info selv.</p>
         </div>
         <BottomNav />
+        <ConsentGate />
       </body>
     </html>
   );
