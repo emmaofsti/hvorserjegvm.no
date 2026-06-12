@@ -25,17 +25,17 @@ const GROUPS = [
   {
     title: "Komplette oversikter",
     eyebrow: "Hovedguider",
-    slugs: ["hvor-se-vm-i-oslo", "fan-zone-oslo-vm", "vm-storskjerm-oslo"],
+    slugs: ["hvor-se-vm-i-oslo", "fan-zone-oslo-vm", "vm-storskjerm-oslo", "norges-kamper-vm-2026", "vm-finalen-oslo-2026"],
   },
   {
     title: "Filtrert etter behov",
     eyebrow: "Etter type",
-    slugs: ["gratis-vm-oslo", "billig-ol-vm-oslo", "familievennlig-vm-oslo", "utendors-vm-oslo", "norge-pa-storskjerm-oslo"],
+    slugs: ["gratis-vm-oslo", "billig-ol-vm-oslo", "familievennlig-vm-oslo", "utendors-vm-oslo", "innendors-vm-oslo", "norge-pa-storskjerm-oslo", "vm-afterwork-oslo"],
   },
   {
     title: "Etter bydel",
     eyebrow: "Geografisk",
-    slugs: ["vm-sentrum-oslo", "vm-grunerlokka-oslo", "vm-aker-brygge-vika-oslo"],
+    slugs: ["vm-sentrum-oslo", "vm-grunerlokka-oslo", "vm-aker-brygge-vika-oslo", "vm-majorstuen-bislett", "vm-bjørvika-gronland"],
   },
   {
     title: "Etter venue-type",
