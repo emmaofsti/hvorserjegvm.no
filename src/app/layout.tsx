@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow, Bebas_Neue } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/Header";
 import BottomNav from "@/components/BottomNav";
@@ -79,6 +80,8 @@ const ORG_SCHEMA = {
   sameAs: ["https://hvorserjegvm.no"],
 };
 
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+
 /* Dark-only — vi setter alltid data-theme="dark" og ignorerer både
    localStorage og prefers-color-scheme. Brukere med light mode på
    OS-nivå får siden i dark uansett. */
@@ -97,6 +100,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="flex min-h-full flex-col">
+        {GA_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga-init" strategy="afterInteractive">{`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${GA_ID}');
+            `}</Script>
+          </>
+        )}
         <Header />
         <main className="flex-1">{children}</main>
         <footer className="border-t border-white/[0.06] py-6 lg:py-8 text-[12px] text-[var(--text-muted)] bottom-safe hidden lg:block">
