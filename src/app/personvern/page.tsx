@@ -46,20 +46,19 @@ export default function PersonvernPage() {
           <li className="flex items-start gap-2.5">
             <Icon.Free size={16} strokeWidth={2.2} className="mt-0.5 shrink-0 text-emerald-300" />
             <span>
-              <strong>Statistikk kun med samtykke.</strong> Vi bruker Google
-              Analytics for anonym besøksstatistikk, men kun hvis du svarer
-              «Ja» på samtykke-spørsmålet. Svarer du «Nei takk», lastes ingen
-              GA-script og ingen cookies settes. Vi bruker ikke Facebook Pixel
-              eller andre annonse-/sporingsverktøy.
+              <strong>Anonym besøksstatistikk.</strong> Vi bruker Google
+              Analytics for å se hvor mange som besøker siden og hvilke sider
+              som er mest brukt. Vi bruker ikke Facebook Pixel eller andre
+              annonse-/sporingsverktøy.
             </span>
           </li>
           <li className="flex items-start gap-2.5">
             <Icon.Free size={16} strokeWidth={2.2} className="mt-0.5 shrink-0 text-emerald-300" />
             <span>
-              <strong>Cookies kun etter samtykke.</strong> Hvis du sier ja til
-              statistikk, setter Google Analytics cookies (
-              <code className="text-[12.5px]">_ga</code> m.fl.) for å skille
-              besøkende fra hverandre. Utover dette setter vi ingen cookies.
+              <strong>Cookies kun til statistikk.</strong> Google Analytics
+              setter cookies (<code className="text-[12.5px]">_ga</code> m.fl.)
+              for å skille besøkende fra hverandre. Utover dette setter vi
+              ingen cookies.
             </span>
           </li>
           <li className="flex items-start gap-2.5">
@@ -225,10 +224,9 @@ export default function PersonvernPage() {
         </p>
         <ul className="space-y-2 text-[14px] text-slate-300 leading-relaxed">
           <li>
-            <strong>Google Analytics</strong> — besøksstatistikk, lastes kun
-            hvis du samtykker. Mottar da anonymisert informasjon om
-            sidevisninger, enhetstype og omtrentlig geografisk område. Brukes
-            kun til å forstå hvordan siden brukes.
+            <strong>Google Analytics</strong> — besøksstatistikk. Mottar
+            anonymisert informasjon om sidevisninger, enhetstype og omtrentlig
+            geografisk område. Brukes kun til å forstå hvordan siden brukes.
           </li>
           <li>
             <strong>Vercel</strong> — host, kjører siden vår. Logger
