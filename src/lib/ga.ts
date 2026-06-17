@@ -44,6 +44,9 @@ export type Stats = {
   };
   hourly: { dateHour: string; users: number }[]; // dateHour = YYYYMMDDHH
   topPages: { title: string; views: number }[];
+  matchPages: { title: string; views: number }[];
+  venuePages: { title: string; views: number }[];
+  outbound: { domain: string; clicks: number }[];
   channels: { channel: string; sessions: number }[];
   countries: { country: string; users: number }[];
   events: { name: string; count: number }[];
@@ -75,6 +78,9 @@ export async function getStats(
     [totalsRes],
     [hourlyRes],
     [pagesRes],
+    [matchRes],
+    [venueRes],
+    [outboundRes],
     [channelsRes],
     [countriesRes],
     [eventsRes],
@@ -107,6 +113,48 @@ export async function getStats(
       dimensions: [{ name: "pageTitle" }],
       metrics: [{ name: "screenPageViews" }],
       orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }],
+      limit: 8,
+    }),
+    client.runReport({
+      property: property(),
+      dateRanges: range,
+      dimensions: [{ name: "pageTitle" }],
+      metrics: [{ name: "screenPageViews" }],
+      dimensionFilter: {
+        filter: {
+          fieldName: "pagePath",
+          stringFilter: { matchType: "BEGINS_WITH", value: "/kamp/" },
+        },
+      },
+      orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }],
+      limit: 8,
+    }),
+    client.runReport({
+      property: property(),
+      dateRanges: range,
+      dimensions: [{ name: "pageTitle" }],
+      metrics: [{ name: "screenPageViews" }],
+      dimensionFilter: {
+        filter: {
+          fieldName: "pagePath",
+          stringFilter: { matchType: "BEGINS_WITH", value: "/sted/" },
+        },
+      },
+      orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }],
+      limit: 8,
+    }),
+    client.runReport({
+      property: property(),
+      dateRanges: range,
+      dimensions: [{ name: "linkDomain" }],
+      metrics: [{ name: "eventCount" }],
+      dimensionFilter: {
+        filter: {
+          fieldName: "eventName",
+          stringFilter: { matchType: "EXACT", value: "click" },
+        },
+      },
+      orderBys: [{ metric: { metricName: "eventCount" }, desc: true }],
       limit: 8,
     }),
     client.runReport({
@@ -177,6 +225,23 @@ export async function getStats(
         title: r.dimensionValues?.[0]?.value ?? "",
         views: num(r.metricValues?.[0]?.value),
       })) ?? [],
+    matchPages:
+      matchRes.rows?.map((r) => ({
+        title: r.dimensionValues?.[0]?.value ?? "",
+        views: num(r.metricValues?.[0]?.value),
+      })) ?? [],
+    venuePages:
+      venueRes.rows?.map((r) => ({
+        title: r.dimensionValues?.[0]?.value ?? "",
+        views: num(r.metricValues?.[0]?.value),
+      })) ?? [],
+    outbound:
+      outboundRes.rows
+        ?.map((r) => ({
+          domain: r.dimensionValues?.[0]?.value ?? "",
+          clicks: num(r.metricValues?.[0]?.value),
+        }))
+        .filter((o) => o.domain && o.domain !== "(not set)") ?? [],
     channels:
       channelsRes.rows?.map((r) => ({
         channel: r.dimensionValues?.[0]?.value ?? "",

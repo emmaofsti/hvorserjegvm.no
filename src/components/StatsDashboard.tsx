@@ -23,6 +23,8 @@ function fmtDur(sec: number): string {
   return `${m}m ${s}s`;
 }
 const nb = (n: number) => n.toLocaleString("nb-NO");
+// "The Old Irish Pub … — VM 2026 … · hvorserjegvm.no" → "The Old Irish Pub …"
+const cleanTitle = (t: string) => t.split(" · ")[0].split(" — ")[0].trim() || t;
 
 // "YYYYMMDDHH" → { dayKey, hour, label }
 function parseHour(dh: string) {
@@ -274,6 +276,33 @@ export default function StatsDashboard() {
         <BarList title="Mest besøkte sider" rows={data.topPages.map((p) => ({ label: p.title, value: p.views }))} color="#E24B4A" />
         <BarList title="Hvor de kommer fra" rows={data.channels.map((c) => ({ label: c.channel, value: c.sessions }))} color="#378ADD" />
       </div>
+
+      {/* Kamper + steder */}
+      {(data.matchPages.length > 0 || data.venuePages.length > 0) && (
+        <div className="mb-7 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <BarList
+            title="Mest populære kamper"
+            rows={data.matchPages.map((p) => ({ label: cleanTitle(p.title), value: p.views }))}
+            color="#EF9F27"
+          />
+          <BarList
+            title="Mest populære steder"
+            rows={data.venuePages.map((p) => ({ label: cleanTitle(p.title), value: p.views }))}
+            color="#1D9E75"
+          />
+        </div>
+      )}
+
+      {/* Utgående klikk */}
+      {data.outbound.length > 0 && (
+        <div className="mb-7 max-w-md">
+          <BarList
+            title="Klikk videre til"
+            rows={data.outbound.map((o) => ({ label: o.domain, value: o.clicks }))}
+            color="#7F77DD"
+          />
+        </div>
+      )}
 
       {/* Morsomme funn */}
       <h2 className="mb-2.5 text-[15px] font-semibold">Morsomme funn</h2>
