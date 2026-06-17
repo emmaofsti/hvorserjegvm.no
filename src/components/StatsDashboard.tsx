@@ -7,6 +7,15 @@ import { Icon } from "./icons";
 const DAY_COLORS = ["#EF9F27", "#E24B4A", "#378ADD", "#1D9E75", "#7F77DD"];
 const REFRESH_MS = 60_000;
 
+type Sel = { label: string; from: string; to: string; hourFrom: string; hourTo: string };
+const PRESETS: Sel[] = [
+  { label: "I dag", from: "today", to: "today", hourFrom: "today", hourTo: "today" },
+  { label: "I går", from: "yesterday", to: "yesterday", hourFrom: "yesterday", hourTo: "yesterday" },
+  { label: "Siste 7 dager", from: "7daysAgo", to: "today", hourFrom: "2daysAgo", hourTo: "today" },
+  { label: "Alle dager", from: "90daysAgo", to: "today", hourFrom: "2daysAgo", hourTo: "today" },
+];
+const TODAY = new Date().toISOString().slice(0, 10);
+
 function fmtDur(sec: number): string {
   if (sec < 60) return `${Math.round(sec)} s`;
   const m = Math.floor(sec / 60);
@@ -35,13 +44,17 @@ export default function StatsDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [updated, setUpdated] = useState<Date | null>(null);
   const [hover, setHover] = useState<{ x: number; label: string; users: number } | null>(null);
-  const [period, setPeriod] = useState<"all" | "today">("all");
+  const [sel, setSel] = useState<Sel>(PRESETS[3]);
+  const [day, setDay] = useState("");
 
   useEffect(() => {
     let alive = true;
     async function load() {
       try {
-        const res = await fetch(`/api/stats?period=${period}`, { cache: "no-store" });
+        const res = await fetch(
+          `/api/stats?from=${sel.from}&to=${sel.to}&hourFrom=${sel.hourFrom}&hourTo=${sel.hourTo}`,
+          { cache: "no-store" },
+        );
         if (!res.ok) throw new Error(`Feil ${res.status}`);
         const json = (await res.json()) as Stats;
         if (!alive) return;
@@ -58,7 +71,7 @@ export default function StatsDashboard() {
       alive = false;
       clearInterval(id);
     };
-  }, [period]);
+  }, [sel]);
 
   if (error && !data) {
     return (
@@ -149,21 +162,43 @@ export default function StatsDashboard() {
         </span>
       </div>
 
-      {/* Periode-bryter */}
-      <div className="mb-5 inline-flex rounded-lg border border-white/[0.08] p-0.5 text-[13px]">
-        {([["all", "Alle dager"], ["today", "I dag"]] as const).map(([key, label]) => (
-          <button
-            key={key}
-            onClick={() => setPeriod(key)}
-            className={`rounded-md px-3 py-1.5 transition-colors ${
-              period === key
-                ? "bg-red-500 font-medium text-white"
-                : "text-[var(--text-muted)] hover:text-white"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      {/* Periodevelger */}
+      <div className="mb-5 flex flex-wrap items-center gap-2">
+        <div className="inline-flex rounded-lg border border-white/[0.08] p-0.5 text-[13px]">
+          {PRESETS.map((p) => {
+            const active = !day && sel.label === p.label;
+            return (
+              <button
+                key={p.label}
+                onClick={() => {
+                  setDay("");
+                  setSel(p);
+                }}
+                className={`rounded-md px-3 py-1.5 transition-colors ${
+                  active
+                    ? "bg-red-500 font-medium text-white"
+                    : "text-[var(--text-muted)] hover:text-white"
+                }`}
+              >
+                {p.label}
+              </button>
+            );
+          })}
+        </div>
+        <input
+          type="date"
+          value={day}
+          max={TODAY}
+          onChange={(e) => {
+            const d = e.target.value;
+            setDay(d);
+            if (d) setSel({ label: d, from: d, to: d, hourFrom: d, hourTo: d });
+          }}
+          aria-label="Velg en bestemt dag"
+          className={`rounded-lg border bg-white/[0.04] px-3 py-1.5 text-[13px] text-white [color-scheme:dark] focus:outline-none ${
+            day ? "border-red-400/60" : "border-white/[0.08]"
+          }`}
+        />
       </div>
 
       {/* Metric-kort */}
@@ -184,8 +219,8 @@ export default function StatsDashboard() {
 
       {/* Time for time */}
       <h2 className="mb-2 text-[15px] font-semibold">
-        {period === "today"
-          ? "Aktive brukere i dag, time for time"
+        {sel.hourFrom === sel.hourTo
+          ? "Aktive brukere time for time"
           : "Aktive brukere time for time (siste dager)"}
       </h2>
       <div className="mb-2 flex flex-wrap gap-3 text-[12px] text-[var(--text-muted)]">

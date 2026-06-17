@@ -52,24 +52,24 @@ export type Stats = {
 
 // Enkel in-memory-cache så flere samtidige seere (og hyppig polling) ikke
 // brenner GA-kvoten. Lever bare så lenge serverinstansen er varm.
-export type Period = "today" | "all";
-
-const cache: Partial<Record<Period, { data: Stats; ts: number }>> = {};
+// Datoene er GA-uttrykk: "today", "yesterday", "NdaysAgo" eller "YYYY-MM-DD".
+// from/to styrer totaltallene, hourFrom/hourTo styrer time-for-time-grafen.
+const cache: Record<string, { data: Stats; ts: number }> = {};
 const TTL_MS = 45_000;
 
-export async function getStats(period: Period = "all"): Promise<Stats> {
-  const cached = cache[period];
+export async function getStats(
+  from: string,
+  to: string,
+  hourFrom: string,
+  hourTo: string,
+): Promise<Stats> {
+  const key = `${from}|${to}|${hourFrom}|${hourTo}`;
+  const cached = cache[key];
   if (cached && Date.now() - cached.ts < TTL_MS) return cached.data;
 
   const client = getClient();
-  const range =
-    period === "today"
-      ? [{ startDate: "today", endDate: "today" }]
-      : [{ startDate: "90daysAgo", endDate: "today" }];
-  const hourlyRange =
-    period === "today"
-      ? [{ startDate: "today", endDate: "today" }]
-      : [{ startDate: "3daysAgo", endDate: "today" }];
+  const range = [{ startDate: from, endDate: to }];
+  const hourlyRange = [{ startDate: hourFrom, endDate: hourTo }];
 
   const [
     [totalsRes],
@@ -195,6 +195,6 @@ export async function getStats(period: Period = "all"): Promise<Stats> {
     fetchedAt: new Date().toISOString(),
   };
 
-  cache[period] = { data, ts: Date.now() };
+  cache[key] = { data, ts: Date.now() };
   return data;
 }
