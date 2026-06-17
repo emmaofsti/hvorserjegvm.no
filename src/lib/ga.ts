@@ -52,14 +52,24 @@ export type Stats = {
 
 // Enkel in-memory-cache så flere samtidige seere (og hyppig polling) ikke
 // brenner GA-kvoten. Lever bare så lenge serverinstansen er varm.
-let cache: { data: Stats; ts: number } | null = null;
+export type Period = "today" | "all";
+
+const cache: Partial<Record<Period, { data: Stats; ts: number }>> = {};
 const TTL_MS = 45_000;
 
-export async function getStats(): Promise<Stats> {
-  if (cache && Date.now() - cache.ts < TTL_MS) return cache.data;
+export async function getStats(period: Period = "all"): Promise<Stats> {
+  const cached = cache[period];
+  if (cached && Date.now() - cached.ts < TTL_MS) return cached.data;
 
   const client = getClient();
-  const range = [{ startDate: "90daysAgo", endDate: "today" }];
+  const range =
+    period === "today"
+      ? [{ startDate: "today", endDate: "today" }]
+      : [{ startDate: "90daysAgo", endDate: "today" }];
+  const hourlyRange =
+    period === "today"
+      ? [{ startDate: "today", endDate: "today" }]
+      : [{ startDate: "3daysAgo", endDate: "today" }];
 
   const [
     [totalsRes],
@@ -85,7 +95,7 @@ export async function getStats(): Promise<Stats> {
     }),
     client.runReport({
       property: property(),
-      dateRanges: [{ startDate: "3daysAgo", endDate: "today" }],
+      dateRanges: hourlyRange,
       dimensions: [{ name: "dateHour" }],
       metrics: [{ name: "activeUsers" }],
       orderBys: [{ dimension: { dimensionName: "dateHour" } }],
@@ -185,6 +195,6 @@ export async function getStats(): Promise<Stats> {
     fetchedAt: new Date().toISOString(),
   };
 
-  cache = { data, ts: Date.now() };
+  cache[period] = { data, ts: Date.now() };
   return data;
 }

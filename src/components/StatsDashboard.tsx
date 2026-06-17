@@ -35,12 +35,13 @@ export default function StatsDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [updated, setUpdated] = useState<Date | null>(null);
   const [hover, setHover] = useState<{ x: number; label: string; users: number } | null>(null);
+  const [period, setPeriod] = useState<"all" | "today">("all");
 
   useEffect(() => {
     let alive = true;
     async function load() {
       try {
-        const res = await fetch("/api/stats", { cache: "no-store" });
+        const res = await fetch(`/api/stats?period=${period}`, { cache: "no-store" });
         if (!res.ok) throw new Error(`Feil ${res.status}`);
         const json = (await res.json()) as Stats;
         if (!alive) return;
@@ -57,7 +58,7 @@ export default function StatsDashboard() {
       alive = false;
       clearInterval(id);
     };
-  }, []);
+  }, [period]);
 
   if (error && !data) {
     return (
@@ -148,6 +149,23 @@ export default function StatsDashboard() {
         </span>
       </div>
 
+      {/* Periode-bryter */}
+      <div className="mb-5 inline-flex rounded-lg border border-white/[0.08] p-0.5 text-[13px]">
+        {([["all", "Alle dager"], ["today", "I dag"]] as const).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setPeriod(key)}
+            className={`rounded-md px-3 py-1.5 transition-colors ${
+              period === key
+                ? "bg-red-500 font-medium text-white"
+                : "text-[var(--text-muted)] hover:text-white"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       {/* Metric-kort */}
       <div className="mb-7 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
         {cards.map((c) => {
@@ -165,7 +183,11 @@ export default function StatsDashboard() {
       </div>
 
       {/* Time for time */}
-      <h2 className="mb-2 text-[15px] font-semibold">Aktive brukere time for time</h2>
+      <h2 className="mb-2 text-[15px] font-semibold">
+        {period === "today"
+          ? "Aktive brukere i dag, time for time"
+          : "Aktive brukere time for time (siste dager)"}
+      </h2>
       <div className="mb-2 flex flex-wrap gap-3 text-[12px] text-[var(--text-muted)]">
         {dayLegend.map((d) => (
           <span key={d.key} className="flex items-center gap-1.5">
