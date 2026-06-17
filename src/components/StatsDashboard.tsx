@@ -34,6 +34,7 @@ export default function StatsDashboard() {
   const [data, setData] = useState<Stats | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [updated, setUpdated] = useState<Date | null>(null);
+  const [hover, setHover] = useState<{ x: number; label: string; users: number } | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -173,21 +174,42 @@ export default function StatsDashboard() {
           </span>
         ))}
       </div>
-      <div className="mb-7 flex h-[200px] items-end gap-[2px] rounded-xl bg-white/[0.02] p-3">
+      <div
+        className="relative mb-7 flex h-[200px] items-end gap-[2px] rounded-xl bg-white/[0.02] p-3"
+        onMouseLeave={() => setHover(null)}
+      >
         {data.hourly.map((p) => {
           const info = parseHour(p.dateHour);
           return (
             <div
               key={p.dateHour}
-              className="min-w-0 flex-1 rounded-[1px]"
+              className="min-w-0 flex-1 cursor-default rounded-[1px] transition-[filter] hover:brightness-125"
               style={{
                 height: `${Math.max((p.users / maxUsers) * 100, 1)}%`,
                 background: colorFor(p.dateHour.slice(0, 8)),
               }}
-              title={`${info.dayLabel} kl ${String(info.hour).padStart(2, "0")} — ${nb(p.users)} aktive`}
+              onMouseEnter={(e) => {
+                const row = e.currentTarget.parentElement!.getBoundingClientRect();
+                const bar = e.currentTarget.getBoundingClientRect();
+                const cx = bar.left - row.left + bar.width / 2;
+                setHover({
+                  x: Math.min(Math.max(cx, 52), row.width - 52),
+                  label: `${info.dayLabel} kl ${String(info.hour).padStart(2, "0")}`,
+                  users: p.users,
+                });
+              }}
             />
           );
         })}
+        {hover && (
+          <div
+            className="pointer-events-none absolute top-1.5 z-10 -translate-x-1/2 whitespace-nowrap rounded-md border border-white/10 bg-black/85 px-2.5 py-1.5 text-[12px] text-white shadow-lg"
+            style={{ left: hover.x }}
+          >
+            <span className="text-[14px] font-semibold">{nb(hover.users)}</span> besøkende
+            <span className="text-slate-400"> · {hover.label}</span>
+          </div>
+        )}
       </div>
 
       {/* Topp sider + kilder */}
