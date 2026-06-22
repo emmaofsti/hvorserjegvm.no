@@ -8,10 +8,10 @@ import { getVenues, getNorwayMatches } from "@/lib/data";
 function getUpcomingNorwayMatch() {
   const now = Date.now();
   const HOURS_36 = 36 * 60 * 60 * 1000;
-  const HOURS_3 = 3 * 60 * 60 * 1000;
+  const HOURS_2 = 2 * 60 * 60 * 1000;
   const upcoming = getNorwayMatches()
     .map((m) => ({ match: m, kickoffMs: new Date(`${m.date}T${m.kickoff}:00+02:00`).getTime() }))
-    .filter((x) => x.kickoffMs > now - HOURS_3 && x.kickoffMs - now < HOURS_36)
+    .filter((x) => x.kickoffMs > now - HOURS_2 && x.kickoffMs - now < HOURS_36)
     .sort((a, b) => a.kickoffMs - b.kickoffMs)[0];
   return upcoming?.match ?? null;
 }
