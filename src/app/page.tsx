@@ -1,10 +1,27 @@
 import HomeClient from "@/components/HomeClient";
-import { getVenues } from "@/lib/data";
+import NorwayMatchBanner from "@/components/NorwayMatchBanner";
+import { getVenues, getNorwayMatches } from "@/lib/data";
+
+/* Viser banner for Norges neste kamp når den er innen ~36 timer —
+   fanger opp trafikk fra deling/søk rundt kampstart uten å rote til
+   forsiden resten av tiden. */
+function getUpcomingNorwayMatch() {
+  const now = Date.now();
+  const HOURS_36 = 36 * 60 * 60 * 1000;
+  const HOURS_3 = 3 * 60 * 60 * 1000;
+  const upcoming = getNorwayMatches()
+    .map((m) => ({ match: m, kickoffMs: new Date(`${m.date}T${m.kickoff}:00+02:00`).getTime() }))
+    .filter((x) => x.kickoffMs > now - HOURS_3 && x.kickoffMs - now < HOURS_36)
+    .sort((a, b) => a.kickoffMs - b.kickoffMs)[0];
+  return upcoming?.match ?? null;
+}
 
 export default function Page() {
   const venues = getVenues();
+  const norwayMatch = getUpcomingNorwayMatch();
   return (
     <>
+      {norwayMatch && <NorwayMatchBanner match={norwayMatch} />}
       <HomeClient venues={venues} />
       <script
         type="application/ld+json"
