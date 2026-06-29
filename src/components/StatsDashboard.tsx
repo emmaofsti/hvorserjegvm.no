@@ -112,9 +112,21 @@ export default function StatsDashboard() {
     ? Math.round((t.newUsers / t.activeUsers) * 100)
     : 0;
 
+  // Snitt besøkende per dag = gjennomsnitt av daglige unike brukere.
+  // Bruker faktiske dager med data (ikke kalenderdager i perioden), så
+  // tall blir riktig også når siden er nyere enn det valgte intervallet.
+  const dailyUsers = data.daily.map((d) => d.users);
+  const avgPerDay = dailyUsers.length
+    ? Math.round(dailyUsers.reduce((a, b) => a + b, 0) / dailyUsers.length)
+    : 0;
+  const showAvg = dailyUsers.length > 1;
+
   const cards = [
     { label: "Nå (30 min)", value: nb(data.realtime.total), icon: Icon.Flame, color: "#E24B4A" },
     { label: "Besøkende", value: nb(t.activeUsers), icon: Icon.Users },
+    ...(showAvg
+      ? [{ label: "Snitt/dag", value: nb(avgPerDay), icon: Icon.Calendar }]
+      : []),
     { label: "Visninger", value: nb(t.views), icon: Icon.Tv },
     { label: "Snitt/økt", value: fmtDur(t.engagementPerSession), icon: Icon.Calendar },
     { label: "Sider/økt", value: t.viewsPerSession.toFixed(1).replace(".", ","), icon: Icon.List },
@@ -203,8 +215,12 @@ export default function StatsDashboard() {
         />
       </div>
 
-      {/* Metric-kort */}
-      <div className="mb-7 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
+      {/* Metric-kort — 6 kort som standard, 7 når snitt/dag vises */}
+      <div
+        className={`mb-7 grid grid-cols-2 gap-2.5 sm:grid-cols-3 ${
+          showAvg ? "lg:grid-cols-7" : "lg:grid-cols-6"
+        }`}
+      >
         {cards.map((c) => {
           const I = c.icon;
           return (

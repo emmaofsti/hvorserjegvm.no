@@ -43,6 +43,7 @@ export type Stats = {
     totalEngagedHours: number;
   };
   hourly: { dateHour: string; users: number }[]; // dateHour = YYYYMMDDHH
+  daily: { date: string; users: number }[]; // date = YYYYMMDD
   topPages: { title: string; views: number }[];
   matchPages: { title: string; views: number }[];
   venuePages: { title: string; views: number }[];
@@ -77,6 +78,7 @@ export async function getStats(
   const [
     [totalsRes],
     [hourlyRes],
+    [dailyRes],
     [pagesRes],
     [matchRes],
     [venueRes],
@@ -105,6 +107,15 @@ export async function getStats(
       dimensions: [{ name: "dateHour" }],
       metrics: [{ name: "activeUsers" }],
       orderBys: [{ dimension: { dimensionName: "dateHour" } }],
+      limit: 200,
+    }),
+    // Daglige unike brukere — brukes til å regne ut snitt per dag i UI.
+    client.runReport({
+      property: property(),
+      dateRanges: range,
+      dimensions: [{ name: "date" }],
+      metrics: [{ name: "activeUsers" }],
+      orderBys: [{ dimension: { dimensionName: "date" } }],
       limit: 200,
     }),
     client.runReport({
@@ -218,6 +229,11 @@ export async function getStats(
     hourly:
       hourlyRes.rows?.map((r) => ({
         dateHour: r.dimensionValues?.[0]?.value ?? "",
+        users: num(r.metricValues?.[0]?.value),
+      })) ?? [],
+    daily:
+      dailyRes.rows?.map((r) => ({
+        date: r.dimensionValues?.[0]?.value ?? "",
         users: num(r.metricValues?.[0]?.value),
       })) ?? [],
     topPages:
