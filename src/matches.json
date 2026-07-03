@@ -1008,11 +1008,11 @@
     },
     {
       "id": "r32-12",
-      "slug": "colombia-ghana",
+      "slug": "portugal-kroatia",
       "date": "2026-07-03",
       "kickoff": "01:00",
-      "home": "Colombia",
-      "away": "Ghana",
+      "home": "Portugal",
+      "away": "Kroatia",
       "stage": "16-delsfinale",
       "tvChannel": "NRK / TV 2"
     },
@@ -1048,11 +1048,11 @@
     },
     {
       "id": "r32-16",
-      "slug": "portugal-kroatia",
+      "slug": "colombia-ghana",
       "date": "2026-07-04",
       "kickoff": "03:30",
-      "home": "Portugal",
-      "away": "Kroatia",
+      "home": "Colombia",
+      "away": "Ghana",
       "stage": "16-delsfinale",
       "tvChannel": "NRK / TV 2"
     },
@@ -1100,11 +1100,11 @@
     },
     {
       "id": "r16-05",
-      "slug": "r16-05",
+      "slug": "kroatia-spania",
       "date": "2026-07-06",
       "kickoff": "21:00",
-      "home": "TBD",
-      "away": "TBD",
+      "home": "Kroatia",
+      "away": "Spania",
       "stage": "8-delsfinale",
       "tvChannel": "NRK / TV 2"
     },
@@ -1130,11 +1130,11 @@
     },
     {
       "id": "r16-08",
-      "slug": "r16-08",
+      "slug": "sveits-colombia",
       "date": "2026-07-07",
       "kickoff": "22:00",
-      "home": "TBD",
-      "away": "TBD",
+      "home": "Sveits",
+      "away": "Colombia",
       "stage": "8-delsfinale",
       "tvChannel": "NRK / TV 2"
     },
