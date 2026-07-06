@@ -1100,10 +1100,10 @@
     },
     {
       "id": "r16-05",
-      "slug": "kroatia-spania",
+      "slug": "portugal-spania",
       "date": "2026-07-06",
       "kickoff": "21:00",
-      "home": "Kroatia",
+      "home": "Portugal",
       "away": "Spania",
       "stage": "8-delsfinale",
       "tvChannel": "NRK / TV 2"
@@ -1140,11 +1140,11 @@
     },
     {
       "id": "qf-01",
-      "slug": "qf-01",
+      "slug": "frankrike-marokko",
       "date": "2026-07-09",
       "kickoff": "22:00",
-      "home": "TBD",
-      "away": "TBD",
+      "home": "Frankrike",
+      "away": "Marokko",
       "stage": "Kvartfinale",
       "tvChannel": "NRK / TV 2"
     },
@@ -1160,13 +1160,15 @@
     },
     {
       "id": "qf-03",
-      "slug": "qf-03",
+      "slug": "norge-england",
       "date": "2026-07-11",
       "kickoff": "23:00",
-      "home": "TBD",
-      "away": "TBD",
+      "home": "Norge",
+      "away": "England",
       "stage": "Kvartfinale",
-      "tvChannel": "NRK / TV 2"
+      "tvChannel": "NRK / TV 2",
+      "norwayMatch": true,
+      "tvNorway": "NRK"
     },
     {
       "id": "qf-04",
