@@ -1150,11 +1150,11 @@
     },
     {
       "id": "qf-02",
-      "slug": "qf-02",
+      "slug": "spania-belgia",
       "date": "2026-07-10",
       "kickoff": "21:00",
-      "home": "TBD",
-      "away": "TBD",
+      "home": "Spania",
+      "away": "Belgia",
       "stage": "Kvartfinale",
       "tvChannel": "NRK / TV 2"
     },
@@ -1172,11 +1172,11 @@
     },
     {
       "id": "qf-04",
-      "slug": "qf-04",
+      "slug": "argentina-sveits",
       "date": "2026-07-12",
       "kickoff": "03:00",
-      "home": "TBD",
-      "away": "TBD",
+      "home": "Argentina",
+      "away": "Sveits",
       "stage": "Kvartfinale",
       "tvChannel": "NRK / TV 2"
     },
